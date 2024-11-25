@@ -28,6 +28,7 @@ export default function ImportContactsScreen({ navigation }) {
           style={styles.Icon}
           onPress={() => navigation.navigate("ConfigContacts")}
         >
+          {/* this doesn't work idk why */}
           <Icon name={"circle-right-arrow"} size={30} color="#000000" />
         </TouchableOpacity>
       </View>
