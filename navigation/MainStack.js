@@ -5,6 +5,7 @@ import WelcomeScreen from '../screens/Welcome/WelcomeScreen';
 import LoginScreen from '../screens/Login/LoginScreen';
 import ImportContactsScreen from '../screens/ImportContacts/ImportContactsScreen';
 import ConfigContactsScreen from '../screens/ConfigContactsScreen/ConfigContactsScreen';
+import HomeScreen from '../screens/HomeScreen/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,11 @@ const MainStack = () => {
       <Stack.Screen 
         name="ConfigContacts" 
         component={ConfigContactsScreen} 
+      />
+
+      <Stack.Screen 
+        name="HomeScreen" 
+        component={HomeScreen} 
       />
       
   </Stack.Navigator>

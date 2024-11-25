@@ -42,7 +42,7 @@ export default function ConfigContactsScreen({navigation}) {
                     onPress={() => {
                         console.log('Confirmed number:', inputNumber);
                         // nav to home screen
-                        // navigation.navigate("HomeScreen")
+                        navigation.navigate("HomeScreen")
                     }}
                 >
                     <Text style={styles.buttonText}>Confirm</Text>

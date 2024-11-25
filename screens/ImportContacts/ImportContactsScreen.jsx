@@ -18,9 +18,8 @@ export default function ImportContactsScreen({ navigation }) {
   const contactConfirmed = () => {
     console.log('=====contact modal closed');
     setIsModalVisible(false)
-    navigation.navigate("ConfigContacts")
+    navigation.navigate("HomeScreen")
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -33,7 +32,7 @@ export default function ImportContactsScreen({ navigation }) {
         </TouchableOpacity>
       </View>
       
-      <Modal visible={isModalVisible}>
+      <Modal visible={isModalVisible} animationType="slide">
         <View>
           <Text>Confirm import contacts?</Text>
           <Button title="Close" onPress={contactConfirmed} />
