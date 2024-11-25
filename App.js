@@ -1,11 +1,15 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { AppState } from 'react-native';
+import { useEffect } from 'react';
 import AppNavigator from './navigation/AppNavigator';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+
+//Import firebase
+//import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -29,7 +33,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
+//const db = getFirestore(app);
+
 export default function App() {
+
+  /*
+  useEffect(async() => {
+    const docRef = await addDoc(collection(db, "usersandcontacts"), {
+      username: "teeeeeheeee", // The string field "username"
+    });
+  }, [])
+  */
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppNavigator/>
