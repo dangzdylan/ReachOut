@@ -4,16 +4,11 @@ import {useNavigation} from '@react-navigation/native';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './LoginScreen.styles';
 
-/* Our HomeScreen is a React Component. Remember, every component is just
-    a function that takes in props and returns JSX. We usually use object
-    destructuring to grab declare values we need from props right away.
-*/
-function LoginScreen({navigation}) {
+export default function LoginScreen({navigation}) {
 
   const handleGoogleSignUp = () => {
       console.log('=====Sign up pressed');
-      // navigation.navigate('ImportContacts')
-      navigation.navigate('AuthStack', { screen: 'ImportContactsScreen' });
+      navigation.navigate('ImportContacts');
 
     };
 
@@ -43,5 +38,3 @@ function LoginScreen({navigation}) {
     </SafeAreaView>
   );
 };
-
-export default LoginScreen;
