@@ -8,12 +8,13 @@ import { styles } from './LoginScreen.styles';
     a function that takes in props and returns JSX. We usually use object
     destructuring to grab declare values we need from props right away.
 */
-function LoginScreen() {
-  const navigation = useNavigation();
+function LoginScreen({navigation}) {
 
   const handleGoogleSignUp = () => {
       console.log('=====Sign up pressed');
-      navigation.navigate("Play")
+      // navigation.navigate('ImportContacts')
+      navigation.navigate('AuthStack', { screen: 'ImportContactsScreen' });
+
     };
 
     const handleGoogleLogin = () => {

@@ -5,8 +5,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './WelcomeScreen.styles';
 
 
-export default function WelcomeScreen() {
-  const navigation = useNavigation();
+export default function WelcomeScreen(props) {
+  const navigation = props.navigation;
   useEffect(() => {
       // Set timer to navigate to LoginScreen after 5 seconds
       const timer = setTimeout(() => {
