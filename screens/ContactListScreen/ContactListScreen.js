@@ -1,9 +1,10 @@
-import React from 'react';
+import { React, useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './ContactListScreen.styles';
-
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 
 export default function ContactListScreen({ navigation }) {
  const contacts = [
@@ -15,7 +16,6 @@ export default function ContactListScreen({ navigation }) {
    { id: '6', name: 'Selena Gomez' },
    { id: '7', name: 'Jessica Garcia' },
  ];
-
 
  const renderContact = ({ item }) => (
    <View style={styles.contactItem}>
