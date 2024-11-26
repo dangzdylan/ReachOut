@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import ChecklistComponent from './ChecklistComponent';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.logoContainer}>
-                <Text style={styles.logo}>All Contacts Button</Text>
+                <TouchableOpacity onPress={() => {navigation.navigate('ContactList')}}>
+                  <Text style={styles.logo}>Contacts</Text>
+                </TouchableOpacity>
             </View>
             <View style={styles.greetingContainer}>
                 <Text style={styles.greetingText}>Hi Bob,</Text>
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 15,
-    textAlign: "right"
+    textAlign: "right",
   },
   greetingText: {
     fontSize: 30,

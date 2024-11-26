@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import styles from './ContactListScreen.styles';
 
 
-export default function App() {
+export default function ContactListScreen({ navigation }) {
  const contacts = [
    { id: '1', name: 'Valerie Eng' },
    { id: '2', name: 'Dylan Smith' },
@@ -35,7 +35,7 @@ export default function App() {
        renderItem={renderContact}
        contentContainerStyle={styles.list}
      />
-     <TouchableOpacity style={styles.backButton}>
+     <TouchableOpacity style={styles.backButton} onPress={() => {navigation.navigate("HomeScreen")}}>
        <Ionicons name="arrow-back" size={24} color="gray" />
      </TouchableOpacity>
      <StatusBar style="auto" />
@@ -43,59 +43,6 @@ export default function App() {
  );
 }
 
-
-const styles = StyleSheet.create({
- container: {
-   flex: 1,
-   backgroundColor: 'white',
-   paddingHorizontal: 16,
-   paddingTop: 40,
- },
- header: {
-   fontSize: 24,
-   fontWeight: 'bold',
-   textAlign: 'left',
-   marginBottom: 16,
-   textDecorationLine: 'underline',
- },
- list: {
-   paddingBottom: 40,
- },
- contactItem: {
-   flexDirection: 'row',
-   alignItems: 'center',
-   paddingVertical: 12,
-   borderBottomWidth: 1,
-   borderBottomColor: '#ccc',
- },
- circle: {
-   width: 24,
-   height: 24,
-   borderRadius: 12,
-   borderWidth: 1,
-   borderColor: '#ccc',
-   marginRight: 16,
- },
- contactName: {
-   flex: 1,
-   fontSize: 16,
-   color: '#333',
- },
- backButton: {
-  position: 'absolute',
-  bottom: 16,
-  left: 16,
-  backgroundColor: 'white', 
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderWidth: 2, 
-  borderColor: 'gray', 
-  elevation: 3, 
-},
-});
 
 
 
