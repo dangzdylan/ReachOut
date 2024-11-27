@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './ProfileScreen.styles';
 import { Text, View, Image, Button, StyleSheet, TouchableOpacity, TextInput, Modal, Alert} from 'react-native';
 
@@ -6,6 +6,63 @@ const ProfileScreen = ( {navigation} ) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [profileNotes, setProfileNotes] = useState(''); //LATER FETCH FROM DB
   const [inputText, setInputText] = useState('');
+
+  //These are first without props
+  const [uid, setUID] = useState("susanjones@hotmail.com") //this will be passed as props UID later
+  const [contactPhone, setContactPhone] = useState("4084084088") //this will be passed as props contactPhoneNumber later
+
+  useEffect(() => {
+    async function fetchNotesData() {
+      try {
+        // Reference to the user's document
+        //const userRef = doc(db, "users", uid);   //UNCOMMENT THIS
+        console.log("HEYYY")
+        /*
+        // Reference to the contacts subcollection
+        const contactsRef = collection(userRef, "contacts");
+    
+        // Query to find the contact with the specific phone number
+        const q = query(contactsRef, where("phoneNumber", "==", contactPhone));
+    
+        // Execute the query
+        const querySnapshot = await getDocs(q);
+    
+        // Check if the contact was found
+        if (querySnapshot.empty) {
+          console.log("Contact not found"); //this can be deleted later
+          return;
+        }
+    
+        // Retrieve the notes from the contact document
+        // Retrieve the first contact (since there's only one per phone number)
+        const contactDoc = querySnapshot.docs[0];
+        const contactData = contactDoc.data();
+        console.log("Contact found:", contactData); //this can be deleted later
+  
+        // Reference to the notes subcollection
+        const notesRef = collection(contactDoc.ref, "notes");
+  
+        // Query to get all notes
+        const notesSnapshot = await getDocs(notesRef);
+  
+        // Check if there are any notes
+        if (notesSnapshot.empty) {
+          console.log("Add your first entry");
+          return;
+        }
+  
+        // Log all note entries
+        notesSnapshot.forEach((noteDoc) => {
+          const noteData = noteDoc.data();
+          console.log(`Date: ${noteData.date}, Entry: ${noteData.entry}`);
+        });
+        */
+      } catch (error) {
+        console.error("Error getting contact notes:", error);
+      }
+    }
+    fetchNotesData()
+  }, [])
 
   const handleSubmitEditing = () => {
 
