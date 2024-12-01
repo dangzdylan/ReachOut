@@ -4,41 +4,81 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './ImportContactsScreen.styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import * as Contacts from 'expo-contacts';
+import { addDoc, collection } from "firebase/firestore";
+import { db } from '../../firebaseConfig';
 
-export default function ImportContactsScreen({ navigation }) {
-
-  // Define the modal visibility state
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
+export default function ImportContactsScreen({ navigation, ...props }) {
+  const userId = "userId1";  // Replace with the actual userId
+  // Request permission, fetch contacts
   useEffect(() => {
-    // Set the modal to be visible on initial render
-    setIsModalVisible(true);
+    (async () => {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status === 'granted') {
+        const { data } = await Contacts.getContactsAsync({
+          fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers],
+        });
+
+        // if (data.length > 0) {
+        //   const contact = data[0];
+        //   console.log(contact);
+        // }
+        const importedContacts = data.map(contact => ({
+          name: contact.name,
+          phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
+          notes: contact.notes || "",  // Notes field (if available)
+        }));
+
+        // // DUMMY
+        // const importedContacts = [{
+        //   name: "Test User",
+        //   phone: "1234567890",
+        //   notes: "Test note",
+        // }];
+
+        console.log("=====Imported Contacts:", importedContacts[0])
+        // Call function to add contacts to Firestore
+        await addContactsToFirestore(userId, importedContacts);
+      } else {
+        console.log("Permission not granted to access contacts.");
+      }
+    })();
   }, []);
 
-  const contactConfirmed = () => {
-    console.log('=====contact modal closed');
-    setIsModalVisible(false)
-    navigation.navigate("HomeScreen")
-  };
   return (
     <SafeAreaView style={styles.container}>
-      <View>
+      <View style={styles.container}>
         <Text style={styles.title}>Import Contacts</Text>
         <TouchableOpacity
-          style={styles.Icon}
+          style={styles.button}
           onPress={() => navigation.navigate("ConfigContacts")}
-        >
-          {/* this doesn't work idk why */}
-          <Icon name={"circle-right-arrow"} size={30} color="#000000" />
+          >
+          <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
-      
-      <Modal visible={isModalVisible} animationType="slide">
-        <View>
-          <Text>Confirm import contacts?</Text>
-          <Button title="Close" onPress={contactConfirmed} />
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
+
+async function addContactsToFirestore(userId, importedContacts) {    
+  // Iterate over the imported contacts and add them to Firestore
+  for (const contact of importedContacts) {
+    const { name, phone } = contact;
+
+    // Prepare the contact data to be added
+    const contactData = {
+      Name: name,     // Name field
+      Phone: phone,   // Phone field
+      Notes: contact.notes || "",  // Notes field, if available
+    };
+
+    try {
+      // add a new contact
+      console.log("Firestore Path:", `users/${userId}/contacts`);
+      await addDoc(collection(db, "users", userId, "contacts"), contactData);
+      console.log(`Contact ${name} added successfully`);
+    } catch (error) {
+      console.error("Error adding contact:", error);
+    }
+  }
+}
