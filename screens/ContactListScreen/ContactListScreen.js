@@ -16,11 +16,12 @@ export default function ContactListScreen({ navigation, ...props}) {
   //Grab contacts of current user
   useEffect(() => {
     const getData = async () => {
-      const colRef = collection(db, "users", userId, "contacts");
-      const colSnap = await getDocs(colRef);
+      const ref = doc(db, "users", userId);
+      const uid = (await getDoc(ref)).data()["email"];
+      const colSnap = await getDocs(collection(ref, "contacts"));
       let newContacts = [];
       colSnap.forEach((doc) => {
-        newContacts.push([doc.id, doc.data()]);
+        newContacts.push([doc.id, doc.data(), uid]);
       });
 
       setContactList(newContacts);
@@ -28,13 +29,14 @@ export default function ContactListScreen({ navigation, ...props}) {
 
     getData();
   }, [userId])
-
   //Subcomponent for each contact
   const renderContact = ({ item }) => (
     <View style={styles.contactItem}>
       <Ionicons name="person-circle-outline" size={30} />
       <Text style={styles.contactName}>{"  " + item[1].name}</Text>
-      <TouchableOpacity onPress={() => { navigation.navigate('Profile', { userId: userId, contactId: item[0] }) }}>
+      <TouchableOpacity onPress={() => { 
+        navigation.navigate('Profile', { uid: item[2], contactPhone: item[1]["phone"], contactName: item[1]["name"] }); 
+        }}>
         <Ionicons name="information-circle-outline" size={30} />
       </TouchableOpacity>
     </View>
