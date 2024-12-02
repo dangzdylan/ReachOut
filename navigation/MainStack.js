@@ -20,7 +20,7 @@ const MainStack = () => {
     }>
       <Stack.Screen 
         name="Welcome" 
-        component={WelcomeScreen} 
+        component={WelcomeScreen}
       />
       <Stack.Screen 
         name="Login" 
