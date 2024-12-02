@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
       borderColor: '#DDD',
       marginBottom: 20,
       width: '90%',
-      minHeight: '40%',
+      minHeight: '40%'
     },
     entryDate: {
       fontWeight: 'bold',
@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 20,
       borderRadius: 10,
       alignItems: 'center',
+      marginTop: 10
     },
     addButtonText: {
       color: '#FFF',
