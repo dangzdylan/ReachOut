@@ -19,9 +19,14 @@ GoogleSignin.configure({
 function LoginScreen({navigation}) {
   const [emailText, setEmailText] = useState("")
   const [passwordText, setPasswordText] = useState("")
+  const [nameText, setNameText] = useState("")
 
   const emailHandler = (input) => {
     setEmailText(input)
+  }
+
+  const nameHandler = (input) => {
+    setNameText(input)
   }
 
   const passwordHandler = (input) => {
@@ -41,8 +46,8 @@ function LoginScreen({navigation}) {
       }
     } else {
       const newDocRef = doc(db, "users", emailText)
-      await setDoc(newDocRef, {email: emailText, password: passwordText})
-      navigation.navigate("ImportContacts", {uid: emailText})
+      await setDoc(newDocRef, {email: emailText, name: nameText, password: passwordText})
+      navigation.navigate("ImportContacts", {uid: emailText, name: nameText})
     }
 
   }
@@ -52,6 +57,7 @@ function LoginScreen({navigation}) {
      <View style={styles.content}>
        <Text style={styles.titleText}>Login/Register</Text>
        <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email"/>
+       <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="Name"/>
        <TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" secureTextEntry={true}/>
        <View style={styles.buttonContainer}>
          <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>

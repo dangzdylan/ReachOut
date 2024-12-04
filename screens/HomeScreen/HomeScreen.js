@@ -98,7 +98,7 @@ const HomeScreen = ({ navigation, route }) => {
   return (
       <View style={styles.container}>
           <View style={styles.logoContainer}>
-              <TouchableOpacity onPress={() => {navigation.navigate('ContactList')}}>
+              <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
                 <Text style={styles.logo}>Contacts</Text>
               </TouchableOpacity>
           </View>

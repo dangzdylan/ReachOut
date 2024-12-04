@@ -6,7 +6,9 @@ import styles from './ContactListScreen.styles';
 import { collection, doc, getDoc, getDocs} from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
-export default function ContactListScreen({ navigation, ...props}) {
+export default function ContactListScreen({ navigation, route}) {
+  const {name, email, recommendNumber} = route.params
+
   /*
   ASSUMING props.userId will give me the user's ID
   */
@@ -52,7 +54,7 @@ export default function ContactListScreen({ navigation, ...props}) {
         renderItem={renderContact}
         contentContainerStyle={styles.list}
       />
-      <TouchableOpacity style={styles.backButton} onPress={() => {navigation.navigate("HomeScreen")}}>
+      <TouchableOpacity style={styles.backButton} onPress={() => {navigation.navigate("HomeScreen", (name, email, recommendNumber))}}>
         <Ionicons name="arrow-back" size={24} color="gray" />
       </TouchableOpacity>
       <StatusBar style="auto" />

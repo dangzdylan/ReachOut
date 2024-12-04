@@ -9,7 +9,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
 export default function ImportContactsScreen({ navigation, route }) {
-  const {uid} = route.params
+  const {uid, name} = route.params
   const userId = uid
   // const userId = "userId1";  // Replace with the actual userId
 
@@ -67,7 +67,7 @@ export default function ImportContactsScreen({ navigation, route }) {
         <Text style={styles.title}>Import Contacts</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("ConfigContacts", {uid: userId})}
+          onPress={() => navigation.navigate("ConfigContacts", {uid: userId, name: name})}
           >
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>

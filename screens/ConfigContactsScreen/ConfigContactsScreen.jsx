@@ -7,7 +7,7 @@ import { db } from '../../firebaseConfig';
 
 
 export default function ConfigContactsScreen({navigation, route}) {
-    const {uid} = route.params
+    const {uid, name} = route.params
     const userId = uid
 
     const [inputNumber, setInputNumber] = useState('');
@@ -16,13 +16,13 @@ export default function ConfigContactsScreen({navigation, route}) {
         // only allow numeric values
         const recommendNumber = value.replace(/[^0-9]/g, '');
         setInputNumber(recommendNumber);
-        console.log('=======Number entered:', recommendNumber);
+        console.log('=======Number entered:', inputNumber);
     };
 
     // Function to dismiss keyboard when input is complete
     const handleSubmitEditing = () => {
         Keyboard.dismiss();
-        addNumContactsToFirebase(userId, numContacts)
+        addNumContactsToFirebase(userId, inputNumber)
     };
 
     async function addNumContactsToFirebase(userId, recommendNumberInput) {
@@ -63,7 +63,7 @@ export default function ConfigContactsScreen({navigation, route}) {
                     onPress={() => {
                         console.log('Confirmed number:', inputNumber);
                         // nav to home screen
-                        navigation.navigate("HomeScreen")
+                        navigation.navigate("HomeScreen", {name: name, email: userId, recommendNumber: inputNumber})
                     }}
                 >
                     <Text style={styles.buttonText}>Confirm</Text>
