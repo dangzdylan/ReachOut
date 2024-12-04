@@ -75,17 +75,23 @@ const HomeScreen = ({ navigation, route }) => {
         //IF IT IS A NEW DAY
         if (timeDifference>=60000){ //replace conditional with currentTimeStampDay!==lastTimestampDay
           console.log("# of recommended:",recommendNumber)
-          for (let i = 0; i < recommendNumber; i++) {
+          let randomNumberList = []
+          let i = 0
+          while (i < recommendNumber) {
             // Generate a random number between min and max (inclusive)
             let randomNumber = Math.floor(Math.random() * numberOfContacts);
-            recommendedContactPhoneList.push(entireContactPhoneList[randomNumber])
-            recommendedContactNameList.push(entireContactNameList[randomNumber])
-            phoneQuery = query(contactsRef, where("phone", "==", entireContactPhoneList[randomNumber]))
-            querySnapshot = await getDocs(phoneQuery)
-            let docWanted = querySnapshot.docs[0]
-            await updateDoc(docWanted.ref, {
-              chosen: true // Use new Date() if you prefer a Date object
-            });
+            if (!randomNumberList.includes(randomNumber)) {
+              recommendedContactPhoneList.push(entireContactPhoneList[randomNumber])
+              recommendedContactNameList.push(entireContactNameList[randomNumber])
+              phoneQuery = query(contactsRef, where("phone", "==", entireContactPhoneList[randomNumber]))
+              querySnapshot = await getDocs(phoneQuery)
+              let docWanted = querySnapshot.docs[0]
+              await updateDoc(docWanted.ref, {
+                chosen: true // Use new Date() if you prefer a Date object
+              });
+              randomNumberList.push(randomNumber)
+              i+=1
+            }
           }
           await updateDoc(userDoc.ref, {lastRecommended: new Date()})
         }
