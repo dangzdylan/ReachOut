@@ -121,7 +121,7 @@ const HomeScreen = ({ navigation, route }) => {
                   </TouchableOpacity>
               </View>
               <View style={styles.greetingContainer}>
-                  <Text style={styles.subtitle}>Hi {name.split(" ")[0]},</Text>
+                  <Text style={styles.subtitle}>Hi {name.split(" ")[0]}!</Text>
               </View>
               <View style={styles.titleContainer}>
                   <Text style={styles.title}>Today's Talks</Text>
