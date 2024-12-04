@@ -26,9 +26,12 @@ const HomeScreen = ({ navigation, route }) => {
 
         userData = userDoc.data();
         //console.log(userData)
-        lastTimestampDay = userData.lastRecommended.toDate().toDateString()
+        //let lastTimestampDay = userData.lastRecommended.toDate().toDateString() //this is for 24 hr
+        let lastTimestamp = userData.lastRecommended.toDate() //remove this for 24 hr
         //console.log(lastTimestampDay)
-        currentTimeStampDay = new Date().toDateString()
+        //let currentTimeStampDay = new Date().toDateString() //this is for 24 hr
+        let currentTimeStamp = new Date() //remove this for 24 hr
+        let timeDifference = currentTimeStamp - lastTimestamp //remove this for 24 hr
 
         // Reference to the contacts subcollection
         const contactsRef = collection(userDoc.ref, "contacts");
@@ -52,11 +55,10 @@ const HomeScreen = ({ navigation, route }) => {
           entireContactNameList.push(contactData.name)
 
           if (contactData.chosen) {
-            if (currentTimeStampDay===lastTimestampDay){
+            if (timeDifference < 60000){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
               recommendedContactPhoneList.push(contactData.phone)
               recommendedContactNameList.push(contactData.name)
             } else {
-              console.log("false")
               await updateDoc(contactDoc.ref, {
                 chosen: false // Use new Date() if you prefer a Date object
               });
@@ -66,15 +68,13 @@ const HomeScreen = ({ navigation, route }) => {
         });
 
         //IF IT IS A NEW DAY
-        if (currentTimeStampDay!==lastTimestampDay){
+        if (timeDifference >= 60000){ //replace conditional with currentTimeStampDay!==lastTimestampDay  for 24 hrs
           console.log("=======here")
-          console.log(recommendNumber)
           for (let i = 0; i < recommendNumber; i++) {
             // Generate a random number between min and max (inclusive)
-            const randomNumber = Math.floor(Math.random() * numberOfContacts);
+            let randomNumber = Math.floor(Math.random() * numberOfContacts);
             recommendedContactPhoneList.push(entireContactPhoneList[randomNumber])
             recommendedContactNameList.push(entireContactNameList[randomNumber])
-
             phoneQuery = query(contactsRef, where("phone", "==", entireContactPhoneList[randomNumber]))
             querySnapshot = await getDocs(phoneQuery)
             let docWanted = querySnapshot.docs[0]
@@ -82,6 +82,7 @@ const HomeScreen = ({ navigation, route }) => {
               chosen: true // Use new Date() if you prefer a Date object
             });
           }
+          await updateDoc(userDoc.ref, {lastRecommended: new Date()})
         }
         setRecommendedContactPhones(recommendedContactPhoneList)
         setRecommendedContactNames(recommendedContactNameList)
