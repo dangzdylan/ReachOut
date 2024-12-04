@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './ContactListScreen.styles';
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
@@ -13,6 +13,8 @@ export default function ContactListScreen({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');  // State for the search query
   const userId = email;
 
+  const [loading, setLoading] = useState(true)
+
   // Function to filter contacts based on search query (prefix match)
   const filteredContacts = contactList.filter(contact =>
     contact[1].name.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
@@ -22,6 +24,7 @@ export default function ContactListScreen({ navigation, route }) {
 
   // Grab contacts of current user
   useEffect(() => {
+    setLoading(true)
     const getData = async () => {
       const ref = doc(db, "users", userId);
       const uid = (await getDoc(ref)).data()["email"];
@@ -32,6 +35,7 @@ export default function ContactListScreen({ navigation, route }) {
       });
 
       setContactList(newContacts);
+      setLoading(false)
     };
 
     getData();
@@ -60,32 +64,36 @@ export default function ContactListScreen({ navigation, route }) {
   // Display contacts
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Contacts</Text>
+      {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
+        <>
+          <Text style={styles.header}>Contacts</Text>
 
-      {/* Search Bar */}
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search contacts"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+          {/* Search Bar */}
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search contacts"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
 
-      {/* List of contacts */}
-      <FlatList
-        data={filteredContacts}
-        keyExtractor={(item) => item[0]}
-        renderItem={renderContact}
-        contentContainerStyle={styles.list}
-      />
+          {/* List of contacts */}
+          <FlatList
+            data={filteredContacts}
+            keyExtractor={(item) => item[0]}
+            renderItem={renderContact}
+            contentContainerStyle={styles.list}
+          />
 
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => {
-        navigation.navigate("HomeScreen", { name: name, email: email, recommendNumber: recommendNumber });
-      }}>
-        <Ionicons name="arrow-back" size={24} color="gray" />
-      </TouchableOpacity>
+          {/* Back Button */}
+          <TouchableOpacity style={styles.backButton} onPress={() => {
+            navigation.navigate("HomeScreen", { name: name, email: email, recommendNumber: recommendNumber });
+          }}>
+            <Ionicons name="arrow-back" size={24} color="gray" />
+          </TouchableOpacity>
 
-      <StatusBar style="auto" />
+          <StatusBar style="auto" />
+        </>
+      }
     </View>
   );
 }

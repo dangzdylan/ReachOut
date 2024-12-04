@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useEffect, useState } from 'react';
 import ChecklistComponent from './ChecklistComponent';
 import { styles } from './HomeScreen.styles';
@@ -12,10 +12,13 @@ const HomeScreen = ({ navigation, route }) => {
   const [recommendedContactPhones, setRecommendedContactPhones] = useState([])
   const [recommendedContactNames, setRecommendedContactNames] = useState([])
 
+  const [loading, setLoading] = useState(true)
+
   const {name, email, recommendNumber} = route.params
 
   useEffect(() => {
     async function fetchRecommendedContacts() {
+      setLoading(true)
       try {
 
         // Reference to the user's document
@@ -88,8 +91,10 @@ const HomeScreen = ({ navigation, route }) => {
         }
         setRecommendedContactPhones(recommendedContactPhoneList)
         setRecommendedContactNames(recommendedContactNameList)
+        setLoading(false)
       } catch (error) {
         console.error("Error getting recommended contacts:", error);
+        setLoading(false)
       }
     }
     fetchRecommendedContacts()
@@ -106,25 +111,28 @@ const HomeScreen = ({ navigation, route }) => {
   return (
       <View style={styles.container}>
           {/* <Image source={require('./assets/ROlogo.png')} /> */}
-
-          <View style={styles.logoContainer}>
-              <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
-                <Text style={styles.icon}>👥</Text>
-              </TouchableOpacity>
-          </View>
-          <View style={styles.greetingContainer}>
-              <Text style={styles.subtitle}>Hi {name.split(" ")[0]},</Text>
-          </View>
-          <View style={styles.titleContainer}>
-              <Text style={styles.title}>Today's Talks</Text>
-          </View>
-          <View style={styles.checklistContainer}>
-              <FlatList
-                data={recommendedContactNames}
-                renderItem={renderChecklistItem}
-                keyExtractor={(item, index) => index.toString()} // Use index as key since names could repeat
-              />
-          </View>
+          {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
+            <>
+              <View style={styles.logoContainer}>
+                  <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
+                    <Text style={styles.icon}>👥</Text>
+                  </TouchableOpacity>
+              </View>
+              <View style={styles.greetingContainer}>
+                  <Text style={styles.subtitle}>Hi {name.split(" ")[0]},</Text>
+              </View>
+              <View style={styles.titleContainer}>
+                  <Text style={styles.title}>Today's Talks</Text>
+              </View>
+              <View style={styles.checklistContainer}>
+                  <FlatList
+                    data={recommendedContactNames}
+                    renderItem={renderChecklistItem}
+                    keyExtractor={(item, index) => index.toString()} // Use index as key since names could repeat
+                  />
+              </View>
+            </>
+          }
       </View>
   );
 };
