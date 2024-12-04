@@ -3,7 +3,10 @@ import { View, Image, Text, SafeAreaView, TextInput } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './ConfigContactsScreen.styles';
 
-export default function ConfigContactsScreen({navigation}) {
+export default function ConfigContactsScreen({navigation, route}) {
+    const {uid} = route.params
+    const userId = uid
+
     const [inputNumber, setInputNumber] = useState('');
     const handleNumberChange = (value) => {
         // only allow numeric values
