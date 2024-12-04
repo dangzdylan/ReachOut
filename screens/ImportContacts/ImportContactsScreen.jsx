@@ -11,17 +11,6 @@ import { db } from '../../firebaseConfig';
 export default function ImportContactsScreen({ navigation, route }) {
   const {uid, name} = route.params
   const userId = uid
-  // const userId = "userId1";  // Replace with the actual userId
-
-  async function createNewCollection() {
-    try {
-      const newCollectionRef = collection(db, "newCollectionName");
-      const docRef = await addDoc(newCollectionRef, { field1: "value1", field2: "value2" });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  }
 
   // Request permission, fetch contacts
   useEffect(() => {
@@ -40,20 +29,16 @@ export default function ImportContactsScreen({ navigation, route }) {
           name: contact.name,
           phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
           chosen : false,
-          // TODO: notes collection instead of field
-          notes: contact.notes || "",  // Notes field (if available)
         }));
 
         // // DUMMY
         // const importedContacts = [{
         //   name: "Test User",
         //   phone: "1234567890",
-        //   notes: "Test note",
         // }];
 
         console.log("=====Imported Contacts:", importedContacts[0])
         // Call function to add contacts to Firestore
-        // 
         await addContactsToFirestore(userId, importedContacts);
       } else {
         console.log("Permission not granted to access contacts.");
@@ -86,7 +71,6 @@ async function addContactsToFirestore(userId, importedContacts) {
       name: name,     // Name field
       phone: phone,   // Phone field
       chosen: chosen,
-      notes: contact.notes || "",  // Notes field, if available
     };
 
     try {
