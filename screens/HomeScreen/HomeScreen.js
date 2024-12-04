@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { useEffect, useState } from 'react';
 import ChecklistComponent from './ChecklistComponent';
 import { styles } from './HomeScreen.styles';
-
+import { Ionicons } from '@expo/vector-icons';
 
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy, updateDoc} from "firebase/firestore";
@@ -109,7 +109,9 @@ const HomeScreen = ({ navigation, route }) => {
 
           <View style={styles.logoContainer}>
               <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
-                <Text style={styles.icon}>👥</Text>
+                <Text style={styles.icon}>
+                  <Ionicons name="people-outline" size={50} />
+                </Text>
               </TouchableOpacity>
           </View>
           <View style={styles.greetingContainer}>
