@@ -152,17 +152,17 @@ const ProfileScreen = ( {navigation, route} ) => {
   };
 
   const handleReachOut = () => {
-    const url = `sms:${contactPhone}`; // This will open the iMessage app (or Messages app on iOS)
+    const url = `sms:${contactPhone}`; // url to sms (imsg or message for android)
 
     Linking.canOpenURL(url)
       .then((supported) => {
         if (supported) {
           Linking.openURL(url);
         } else {
-          console.log('Unable to open iMessage');
+          console.log('Unable to open SMS');
         }
       })
-      .catch((err) => console.error('Error opening iMessage:', err));
+      .catch((err) => console.error('Error opening SMS:', err));
   }
 
   

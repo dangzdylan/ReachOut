@@ -1,21 +1,26 @@
 import { React, useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './ContactListScreen.styles';
-import { collection, doc, getDoc, getDocs} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
-export default function ContactListScreen({ navigation, route}) {
-  const {name, email, recommendNumber} = route.params
+export default function ContactListScreen({ navigation, route }) {
+  const { name, email, recommendNumber } = route.params;
 
-  /*
-  ASSUMING props.userId will give me the user's ID
-  */
   const [contactList, setContactList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');  // State for the search query
   const userId = email;
 
-  //Grab contacts of current user
+  // Function to filter contacts based on search query (prefix match)
+  const filteredContacts = contactList.filter(contact =>
+    contact[1].name.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
+    contact[1].phone.includes(searchQuery)
+  );
+
+
+  // Grab contacts of current user
   useEffect(() => {
     const getData = async () => {
       const ref = doc(db, "users", userId);
@@ -30,40 +35,58 @@ export default function ContactListScreen({ navigation, route}) {
     };
 
     getData();
-  }, [userId])
-  //Subcomponent for each contact
+  }, [userId]);
+
+  // Subcomponent for each contact
   const renderContact = ({ item }) => (
     <View style={styles.contactItem}>
       <Ionicons name="person-circle-outline" size={30} />
       <Text style={styles.contactName}>{"  " + item[1].name}</Text>
-      <TouchableOpacity onPress={() => { 
-        navigation.navigate('Profile', { uid: item[2], contactPhone: item[1]["phone"], contactName: item[1]["name"], name: name, recommendNumber: recommendNumber, lastScreen : "ContactList"}); 
-        }}>
+      <TouchableOpacity onPress={() => {
+        navigation.navigate('Profile', {
+          uid: item[2],
+          contactPhone: item[1]["phone"],
+          contactName: item[1]["name"],
+          name: name,
+          recommendNumber: recommendNumber,
+          lastScreen: "ContactList"
+        });
+      }}>
         <Ionicons name="information-circle-outline" size={40} />
       </TouchableOpacity>
     </View>
   );
 
-  //Display contacts
+  // Display contacts
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Contacts</Text>
+
+      {/* Search Bar */}
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search contacts"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      {/* List of contacts */}
       <FlatList
-        data={contactList}
+        data={filteredContacts}
         keyExtractor={(item) => item[0]}
         renderItem={renderContact}
         contentContainerStyle={styles.list}
       />
-      <TouchableOpacity style={styles.backButton} onPress={() => {navigation.navigate("HomeScreen", {name: name, email: email, recommendNumber: recommendNumber})}}>
+
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => {
+        navigation.navigate("HomeScreen", { name: name, email: email, recommendNumber: recommendNumber });
+      }}>
         <Ionicons name="arrow-back" size={24} color="gray" />
       </TouchableOpacity>
+
       <StatusBar style="auto" />
     </View>
   );
 }
-
-
-
-
-
 
