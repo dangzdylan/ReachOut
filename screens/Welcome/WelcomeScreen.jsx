@@ -23,6 +23,7 @@ export default function WelcomeScreen(props) {
             <Text style={styles.title}>Hello!</Text>
             <Text style={styles.subtitle}>Let's reach out!</Text>
         </View>
+        {/* <Image source={require('./assets/ROlogo.png')} /> */}
       </View>
     </SafeAreaView>
   );

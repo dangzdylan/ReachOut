@@ -3,7 +3,6 @@ import { Modal, Button, View, Text, SafeAreaView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './ImportContactsScreenStyles';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Contacts from 'expo-contacts';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
