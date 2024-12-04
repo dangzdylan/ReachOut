@@ -6,7 +6,6 @@ import { styles } from './ImportContactsScreenStyles';
 import * as Contacts from 'expo-contacts';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
-import { styles } from './ImportContactsScreenStyles';
 
 export default function ImportContactsScreen({ navigation, route }) {
   const { uid, name } = route.params;
