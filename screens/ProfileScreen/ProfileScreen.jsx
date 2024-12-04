@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ProfileScreen.styles';
-import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView} from 'react-native';
+import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking} from 'react-native';
 
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
@@ -152,7 +152,17 @@ const ProfileScreen = ( {navigation, route} ) => {
   };
 
   const handleReachOut = () => {
-    //TODO
+    const url = `sms:${contactPhone}`; // This will open the iMessage app (or Messages app on iOS)
+
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          console.log('Unable to open iMessage');
+        }
+      })
+      .catch((err) => console.error('Error opening iMessage:', err));
   }
 
   
