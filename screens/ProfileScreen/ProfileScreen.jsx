@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ProfileScreen.styles';
-import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking} from 'react-native';
+import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking, ActivityIndicator} from 'react-native';
 
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
@@ -16,6 +16,8 @@ const ProfileScreen = ( {navigation, route} ) => {
   const [inputText, setInputText] = useState('');
   const [noteAdded, setNoteAdded] = useState(0);
 
+  const [loading, setLoading] = useState(true)
+
   //These are first without props
   //const [uid, setUID] = useState("susanjones@hotmail.com") //this will be passed as props UID later
   //const [contactPhone, setContactPhone] = useState("4084084088") //this will be passed as props contactPhoneNumber later
@@ -24,6 +26,7 @@ const ProfileScreen = ( {navigation, route} ) => {
 
   useEffect(() => {
     async function fetchNotesData() {
+      setLoading(true)
       try {
         // Reference to the user's document
         const userRef = collection(db, "users");
@@ -81,16 +84,19 @@ const ProfileScreen = ( {navigation, route} ) => {
             setDateNotes(dateNotesArray)
             setEntryNotes(entryNotesArray)
           }
-        });
 
+        });
+        setLoading(false)
       } catch (error) {
         console.error("Error getting contact notes:", error);
+        setLoading(false)
       }
     }
     fetchNotesData()
   }, [noteAdded])
 
   const addToFirebase = async() => {
+    setLoading(true)
     try {
       // Reference to the users collection
       const usersRef = collection(db, "users");
@@ -118,8 +124,10 @@ const ProfileScreen = ( {navigation, route} ) => {
   
       // Add the new note to the notes subcollection
       const newNoteRef = await addDoc(notesRef, {date: new Date(), entry: inputText});
+      setLoading(false)
     } catch (error) {
       console.error("Error adding note:", error);
+      setLoading(false)
     }
   }
 
@@ -168,93 +176,96 @@ const ProfileScreen = ( {navigation, route} ) => {
   
   return (
     <View style={styles.container}>
-      {/*
-      <Image
-        source={{
-          uri: 'https://via.placeholder.com/150', // Replace this with the URL of the dog image
-        }}
-        style={styles.image}
-      />
-      */
-      }
-      <Text style={styles.name}>{contactName}</Text>
-      <TouchableOpacity style={styles.button} onPress={handleReachOut}>
-        <Text style={styles.buttonText}>Reach Out!</Text>
-      </TouchableOpacity>
+      {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
+        <>
+          {/*
+          <Image
+            source={{
+              uri: 'https://via.placeholder.com/150', // Replace this with the URL of the dog image
+            }}
+            style={styles.image}
+          />
+          */
+          }
+          <Text style={styles.name}>{contactName}</Text>
+          <TouchableOpacity style={styles.button} onPress={handleReachOut}>
+            <Text style={styles.buttonText}>Reach Out!</Text>
+          </TouchableOpacity>
 
-      <>
-      {/* Notes box */}
-      {/*
-        <View style={styles.entriesContainer}>
-        <Text style={styles.entryText}>
-          {profileNotes || 'Add your first entry!'}
-        </Text>
-        </View>
-      */}
-      <ScrollView style={styles.entriesContainer} showsVerticalScrollIndicator={true} scrollIndicatorInsets={{ top: 10, bottom: 10 }}>
-        {dateNotes.length==0 ? <Text style={styles.entryText}>Your entries are displayed here!</Text> :
-        dateNotes.map((item1, index) => (
-          <View key={index}>
-            <Text style={{ ...styles.entryText, fontWeight: 'bold' }}>{item1}:</Text>
-            <Text style={styles.entryText}>{entryNotes[index]}</Text>
-            <Text></Text>
-          </View>
-        ))}
-      </ScrollView>
-
-       {/* Modal for Typing and Date Selection */}
-       <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Notes</Text>
-            
-            {/* Text Input for Notes */}
-            <TextInput
-              style={styles.modalInput}
-              multiline
-              value={inputText}
-              returnKeyType="done"
-              onChangeText={(text) => setInputText(text)}
-            />
-            
-            <Text style={styles.dateText}>
-              {new Date().toDateString()} {/* Display the current date */}
+          <>
+          {/* Notes box */}
+          {/*
+            <View style={styles.entriesContainer}>
+            <Text style={styles.entryText}>
+              {profileNotes || 'Add your first entry!'}
             </Text>
+            </View>
+          */}
+          <ScrollView style={styles.entriesContainer} showsVerticalScrollIndicator={true} scrollIndicatorInsets={{ top: 10, bottom: 10 }}>
+            {dateNotes.length==0 ? <Text style={styles.entryText}>Your entries are displayed here!</Text> :
+            dateNotes.map((item1, index) => (
+              <View key={index}>
+                <Text style={{ ...styles.entryText, fontWeight: 'bold' }}>{item1}:</Text>
+                <Text style={styles.entryText}>{entryNotes[index]}</Text>
+                <Text></Text>
+              </View>
+            ))}
+          </ScrollView>
 
-            {/* Save Button */}
+          {/* Modal for Typing and Date Selection */}
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Edit Notes</Text>
+                
+                {/* Text Input for Notes */}
+                <TextInput
+                  style={styles.modalInput}
+                  multiline
+                  value={inputText}
+                  returnKeyType="done"
+                  onChangeText={(text) => setInputText(text)}
+                />
+                
+                <Text style={styles.dateText}>
+                  {new Date().toDateString()} {/* Display the current date */}
+                </Text>
+
+                {/* Save Button */}
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={handleSubmitEditing}
+                >
+                  <Text style={styles.addButtonText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          </>
+
+          <View style={styles.footer}>
+            {/* Back Button */}
             <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleSubmitEditing}
+              style={styles.backButtonWrapper}
+              onPress={handleGoBack}
             >
-              <Text style={styles.addButtonText}>Save</Text>
+              <Text style={styles.backButtonIcon}>←</Text>
+            </TouchableOpacity>
+
+            {/* Add Entry Button */}
+            <TouchableOpacity
+              style={styles.addButtonWrapper}
+              onPress={handleAddEntry}
+            >
+              <Text style={styles.addButtonText}>Add Entry</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-    </>
-
-      <View style={styles.footer}>
-        {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backButtonWrapper}
-          onPress={handleGoBack}
-        >
-          <Text style={styles.backButtonIcon}>←</Text>
-        </TouchableOpacity>
-
-        {/* Add Entry Button */}
-        <TouchableOpacity
-          style={styles.addButtonWrapper}
-          onPress={handleAddEntry}
-        >
-          <Text style={styles.addButtonText}>Add Entry</Text>
-        </TouchableOpacity>
-      </View>
+        </>
+      }
     </View>
   );
 };
