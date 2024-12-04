@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
 const ChecklistComponent = (props) => {
 
@@ -17,7 +18,7 @@ const ChecklistComponent = (props) => {
     return (
         <TouchableOpacity style={styles.container} onPress={() => props.goToProfile()}>
             <View style={styles.pictureContainer}>
-                <Text style={styles.pictureText}>🗣</Text>
+              <Ionicons name="person-circle-outline" size={50} />
             </View>
             <View style={styles.nameContainer}>
                 <Text style={styles.nameText}>{props.name}</Text>
@@ -49,7 +50,6 @@ const styles = StyleSheet.create({
       width: 60,
       height: 45,
       borderRadius: 10,
-      backgroundColor: '#FFFCC9',
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: 20,
