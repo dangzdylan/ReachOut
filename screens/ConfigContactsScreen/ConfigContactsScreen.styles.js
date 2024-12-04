@@ -44,11 +44,18 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
   },
   input: {
-    height: 40,
-    margin: 12,
+    width: '100%', // Full width of the container
+    height: 50, // Increase the height for a rounded look
+    borderColor: '#ccc', // Light gray border
     borderWidth: 1,
-    padding: 10,
-  },
+    borderRadius: 25, // Rounded corners
+    paddingHorizontal: 15, // Space inside the input
+    marginBottom: 15, // Space between inputs
+    backgroundColor: '#f9f9f9', // Light gray background
+    fontSize: 16, // Adjust text size
+    color: '#000000',
+  }
+  ,
 });
 
 export default styles;

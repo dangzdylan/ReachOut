@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from "react"; // Add useState to the import
-import { Modal, Button, View, Text, SafeAreaView } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { styles } from './ImportContactsScreenStyles';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React, { useEffect, useState } from "react";
+import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
 import * as Contacts from 'expo-contacts';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
+import { styles } from './ImportContactsScreenStyles';
 
 export default function ImportContactsScreen({ navigation, route }) {
-  const {uid, name} = route.params
-  const userId = uid
+  const { uid, name } = route.params;
+  const userId = uid;
 
-  // Request permission, fetch contacts
   useEffect(() => {
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
@@ -21,24 +17,13 @@ export default function ImportContactsScreen({ navigation, route }) {
           fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers],
         });
 
-        // if (data.length > 0) {
-        //   const contact = data[0];
-        //   console.log(contact);
-        // }
         const importedContacts = data.map(contact => ({
           name: contact.name,
           phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
           chosen : false,
         }));
 
-        // // DUMMY
-        // const importedContacts = [{
-        //   name: "Test User",
-        //   phone: "1234567890",
-        // }];
-
-        console.log("=====Imported Contacts:", importedContacts[0])
-        // Call function to add contacts to Firestore
+        console.log("=====Imported Contacts:", importedContacts[0]);
         await addContactsToFirestore(userId, importedContacts);
       } else {
         console.log("Permission not granted to access contacts.");
@@ -48,25 +33,23 @@ export default function ImportContactsScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
+      <View>
         <Text style={styles.title}>Import Contacts</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("ConfigContacts", {uid: userId, name: name})}
-          >
+          onPress={() => navigation.navigate("ConfigContacts", { uid: userId, name: name })}
+        >
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
-};
+}
 
-async function addContactsToFirestore(userId, importedContacts) {    
-  // Iterate over the imported contacts and add them to Firestore
+async function addContactsToFirestore(userId, importedContacts) {
   for (const contact of importedContacts) {
     const { name, phone, chosen } = contact;
 
-    // Prepare the contact data to be added
     const contactData = {
       name: name,     // Name field
       phone: phone,   // Phone field
@@ -74,7 +57,6 @@ async function addContactsToFirestore(userId, importedContacts) {
     };
 
     try {
-      // add a new contact
       await addDoc(collection(db, "users", userId, "contacts"), contactData);
     } catch (error) {
       console.error("Error adding contact:", error);

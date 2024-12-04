@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ProfileScreen.styles';
-import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView} from 'react-native';
+import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking} from 'react-native';
 
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
 
 const ProfileScreen = ( {navigation, route} ) => {
   
-  const {uid, contactPhone, contactName, name, recommendNumber} = route.params;
+  const {uid, contactPhone, contactName, name, recommendNumber, lastScreen} = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
   //const [profileNotes, setProfileNotes] = useState()
@@ -144,7 +144,7 @@ const ProfileScreen = ( {navigation, route} ) => {
   };
 
   const handleGoBack = () => {
-    navigation.navigate('HomeScreen', {name: name, email: uid, recommendNumber: recommendNumber});
+    navigation.navigate(lastScreen, {name: name, email: uid, recommendNumber: recommendNumber});
   };
 
   const handleAddEntry = () => {
@@ -152,7 +152,17 @@ const ProfileScreen = ( {navigation, route} ) => {
   };
 
   const handleReachOut = () => {
-    //TODO
+    const url = `sms:${contactPhone}`; // url to sms (imsg or message for android)
+
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          console.log('Unable to open SMS');
+        }
+      })
+      .catch((err) => console.error('Error opening SMS:', err));
   }
 
   

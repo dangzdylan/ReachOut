@@ -39,7 +39,7 @@ function LoginScreen({navigation}) {
 
     if (docSnap.exists()) {
       if (docSnap.data().password===passwordText) {
-        navigation.navigate("HomeScreen", {name: docSnap.data().name, uid: emailText, recommendNumber: docSnap.data().recommendNumber}) //const {name, email, recommendNumber} = route.params
+        navigation.navigate("HomeScreen", {name: docSnap.data().name, email: emailText, recommendNumber: docSnap.data().recommendNumber}) //const {name, email, recommendNumber} = route.params
       } else {
         Alert.alert("Error", "Password is incorrect!")
         setPasswordText("")

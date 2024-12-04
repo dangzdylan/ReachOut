@@ -51,6 +51,15 @@ const styles = StyleSheet.create({
      borderColor: 'gray', 
      elevation: 3, 
    },
-   });
+   searchBar: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 10,
+    paddingLeft: 10,
+    backgroundColor: '#fff',
+  },
+  });
 
    export default styles;
