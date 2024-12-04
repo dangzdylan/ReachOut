@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react"; // Add useState to the import
+import { Modal, Button, View, Text, SafeAreaView } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { styles } from './ImportContactsScreenStyles';
 import * as Contacts from 'expo-contacts';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';

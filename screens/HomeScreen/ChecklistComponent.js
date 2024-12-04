@@ -17,13 +17,14 @@ const ChecklistComponent = (props) => {
     return (
         <TouchableOpacity style={styles.container} onPress={() => props.goToProfile()}>
             <View style={styles.pictureContainer}>
-                <Text style={styles.pictureText}>Picture</Text>
+                <Text style={styles.pictureText}>🗣</Text>
             </View>
             <View style={styles.nameContainer}>
                 <Text style={styles.nameText}>{props.name}</Text>
             </View>
             <TouchableOpacity style={[styles.checkmarkContainer, {backgroundColor: checkmarkColor}]} onPress={() => setAColor()}>
-                <Text style={styles.checkmarkText}>✔</Text>
+                <Text style={styles.checkmarkText}>✓</Text>
+                {/* other icon: ✔ */}
             </TouchableOpacity>
         </TouchableOpacity>
     );
