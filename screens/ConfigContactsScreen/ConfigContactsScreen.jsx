@@ -7,7 +7,7 @@ import { db } from '../../firebaseConfig';
 
 
 export default function ConfigContactsScreen({navigation, route}) {
-    const {uid, name} = route.params
+    const {uid} = route.params
     const userId = uid
 
     const [inputNumber, setInputNumber] = useState('');
@@ -16,22 +16,19 @@ export default function ConfigContactsScreen({navigation, route}) {
         // only allow numeric values
         const recommendNumber = value.replace(/[^0-9]/g, '');
         setInputNumber(recommendNumber);
-        console.log('=======Number entered:', inputNumber);
+        console.log('=======Number entered:', recommendNumber);
     };
 
     // Function to dismiss keyboard when input is complete
     const handleSubmitEditing = () => {
         Keyboard.dismiss();
-        addNumContactsToFirebase(userId, inputNumber)
+        addNumContactsToFirebase(userId, numContacts)
     };
 
     async function addNumContactsToFirebase(userId, recommendNumberInput) {
         try {
-            const docRef = firestore().collection(db, "users").doc(userId);
-            await docRef.update({
-            recommendNumber: recommendNumberInput, 
-            lastRecommended: new Date(),
-            });
+            const newDocRef = doc(db, "users", emailText)
+            await setDoc(newDocRef, {recommendNumber: recommendNumberInput, lastRecommended: new Date()})  
         console.log(`Number of contacts ${numContactInput} added successfully`);
         } catch (error) {
             console.error('Error adding field: ', error);
@@ -63,7 +60,7 @@ export default function ConfigContactsScreen({navigation, route}) {
                     onPress={() => {
                         console.log('Confirmed number:', inputNumber);
                         // nav to home screen
-                        navigation.navigate("HomeScreen", {name: name, email: userId, recommendNumber: inputNumber})
+                        navigation.navigate("HomeScreen")
                     }}
                 >
                     <Text style={styles.buttonText}>Confirm</Text>
