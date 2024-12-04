@@ -28,6 +28,7 @@ export default function ImportContactsScreen({ navigation, route }) {
         const importedContacts = data.map(contact => ({
           name: contact.name,
           phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
+          chosen : false,
           // TODO: notes collection instead of field
           notes: contact.notes || "",  // Notes field (if available)
         }));
@@ -41,6 +42,7 @@ export default function ImportContactsScreen({ navigation, route }) {
 
         console.log("=====Imported Contacts:", importedContacts[0])
         // Call function to add contacts to Firestore
+        // 
         await addContactsToFirestore(userId, importedContacts);
       } else {
         console.log("Permission not granted to access contacts.");
@@ -66,12 +68,13 @@ export default function ImportContactsScreen({ navigation, route }) {
 async function addContactsToFirestore(userId, importedContacts) {    
   // Iterate over the imported contacts and add them to Firestore
   for (const contact of importedContacts) {
-    const { name, phone } = contact;
+    const { name, phone, chosen } = contact;
 
     // Prepare the contact data to be added
     const contactData = {
       Name: name,     // Name field
       Phone: phone,   // Phone field
+      Chosen: chosen,
       Notes: contact.notes || "",  // Notes field, if available
     };
 

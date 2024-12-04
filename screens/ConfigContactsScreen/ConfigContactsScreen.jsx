@@ -8,6 +8,7 @@ export default function ConfigContactsScreen({navigation, route}) {
     const userId = uid
 
     const [inputNumber, setInputNumber] = useState('');
+    // TODO add time stamp
     const handleNumberChange = (value) => {
         // only allow numeric values
         const numericValue = value.replace(/[^0-9]/g, '');
