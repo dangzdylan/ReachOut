@@ -2,39 +2,36 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  },
-  content: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    padding: 20,
   },
-  buttonContainer: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    bottom: '40%',
-    gap: 10,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
   },
-  icon: {
-    borderWidth:1,
-    borderColor:'rgba(0,0,0,0.2)',
-    alignItems:'center',
-    justifyContent:'center',
-    width:100,
-    height:100,
-    backgroundColor:'#fff',
-    borderRadius:50,
+  button: {
+    backgroundColor: '#AEBAEB',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  iconText: {
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '400',
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 
