@@ -25,7 +25,9 @@ const HomeScreen = ({ navigation, route }) => {
         const userDoc = userQuerySnapshot.docs[0];
 
         userData = userDoc.data();
-        lastTimestampDay = userData.lastRecommended.toDateString()
+        //console.log(userData)
+        lastTimestampDay = userData.lastRecommended.toDate().toDateString()
+        //console.log(lastTimestampDay)
         currentTimeStampDay = new Date().toDateString()
 
         // Reference to the contacts subcollection
@@ -54,6 +56,7 @@ const HomeScreen = ({ navigation, route }) => {
               recommendedContactPhoneList.push(contactData.phone)
               recommendedContactNameList.push(contactData.name)
             } else {
+              console.log("false")
               await updateDoc(contactDoc.ref, {
                 chosen: false // Use new Date() if you prefer a Date object
               });
