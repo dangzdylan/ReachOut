@@ -5,6 +5,15 @@ const ChecklistComponent = (props) => {
 
     const [checkmarkColor, setCheckMarkColor] = useState("#FFFFFF")
 
+    const setAColor = () => {
+      if (checkmarkColor==="#FFFFFF") {
+        setCheckMarkColor("#AEBAEB")
+      } else {
+        setCheckMarkColor("#FFFFFF")
+      }
+    }
+
+
     return (
         <TouchableOpacity style={styles.container} onPress={() => props.goToProfile()}>
             <View style={styles.pictureContainer}>
@@ -13,7 +22,7 @@ const ChecklistComponent = (props) => {
             <View style={styles.nameContainer}>
                 <Text style={styles.nameText}>{props.name}</Text>
             </View>
-            <TouchableOpacity style={[styles.checkmarkContainer, {backgroundColor: checkmarkColor}]} onPress={() => setCheckMarkColor("#FFFCC9")}>
+            <TouchableOpacity style={[styles.checkmarkContainer, {backgroundColor: checkmarkColor}]} onPress={() => setAColor()}>
                 <Text style={styles.checkmarkText}>✔</Text>
             </TouchableOpacity>
         </TouchableOpacity>

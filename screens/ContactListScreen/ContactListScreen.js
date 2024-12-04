@@ -13,7 +13,7 @@ export default function ContactListScreen({ navigation, route}) {
   ASSUMING props.userId will give me the user's ID
   */
   const [contactList, setContactList] = useState([]);
-  const userId = props.userId || "userId1";
+  const userId = email;
 
   //Grab contacts of current user
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function ContactListScreen({ navigation, route}) {
       <Ionicons name="person-circle-outline" size={30} />
       <Text style={styles.contactName}>{"  " + item[1].name}</Text>
       <TouchableOpacity onPress={() => { 
-        navigation.navigate('Profile', { uid: item[2], contactPhone: item[1]["phone"], contactName: item[1]["name"] }); 
+        navigation.navigate('Profile', { uid: item[2], contactPhone: item[1]["phone"], contactName: item[1]["name"], name: name, recommendNumber: recommendNumber }); 
         }}>
         <Ionicons name="information-circle-outline" size={30} />
       </TouchableOpacity>
@@ -54,7 +54,7 @@ export default function ContactListScreen({ navigation, route}) {
         renderItem={renderContact}
         contentContainerStyle={styles.list}
       />
-      <TouchableOpacity style={styles.backButton} onPress={() => {navigation.navigate("HomeScreen", (name, email, recommendNumber))}}>
+      <TouchableOpacity style={styles.backButton} onPress={() => {navigation.navigate("HomeScreen", {name: name, email: email, recommendNumber: recommendNumber})}}>
         <Ionicons name="arrow-back" size={24} color="gray" />
       </TouchableOpacity>
       <StatusBar style="auto" />

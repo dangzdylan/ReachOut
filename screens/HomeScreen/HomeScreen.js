@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import ChecklistComponent from './ChecklistComponent';
 
 import { db } from '../../firebaseConfig';
-import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
+import { collection, getDocs, query, where, addDoc, orderBy, updateDoc} from "firebase/firestore";
 
 const HomeScreen = ({ navigation, route }) => {
 
@@ -67,6 +67,8 @@ const HomeScreen = ({ navigation, route }) => {
 
         //IF IT IS A NEW DAY
         if (currentTimeStampDay!==lastTimestampDay){
+          console.log("=======here")
+          console.log(recommendNumber)
           for (let i = 0; i < recommendNumber; i++) {
             // Generate a random number between min and max (inclusive)
             const randomNumber = Math.floor(Math.random() * numberOfContacts);
@@ -91,7 +93,7 @@ const HomeScreen = ({ navigation, route }) => {
   }, [])
 
   const navigateToProfile = (index, item) => {
-    navigation.navigate("Profile", {uid: email, contactPhone: recommendedContactPhones[index], contactName: item})
+    navigation.navigate("Profile", {uid: email, contactPhone: recommendedContactPhones[index], contactName: item, name: name, recommendNumber: recommendNumber})
   }
 
   const renderChecklistItem = ({ item, index }) => (

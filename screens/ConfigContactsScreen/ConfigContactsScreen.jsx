@@ -7,7 +7,7 @@ import { db } from '../../firebaseConfig';
 
 
 export default function ConfigContactsScreen({navigation, route}) {
-    const {name, uid} = route.params
+    const {uid, name} = route.params
     const userId = uid
 
     const [inputNumber, setInputNumber] = useState('');
@@ -26,9 +26,10 @@ export default function ConfigContactsScreen({navigation, route}) {
 
     async function addNumContactsToFirebase() {
         try {
-            console.log('===========here')
             const newDocRef = doc(db, "users", userId)
-            await setDoc(newDocRef, {recommendNumber: inputNumber, lastRecommended: new Date()}, { merge: true })  
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            await setDoc(newDocRef, {recommendNumber: inputNumber, lastRecommended: yesterday}, { merge: true })  
         console.log(`Number of contacts ${inputNumber} added successfully`);
         } catch (error) {
             console.error('Error adding field: ', error);
@@ -61,7 +62,7 @@ export default function ConfigContactsScreen({navigation, route}) {
                         console.log('Confirmed number:', inputNumber);
                         addNumContactsToFirebase()
                         // nav to home screen
-                        navigation.navigate("HomeScreen", {name: name, email: userId, lastRecommended: inputNumber})
+                        navigation.navigate("HomeScreen", {name: name, email: userId, recommendNumber: inputNumber})
                     }}
                 >
                     <Text style={styles.buttonText}>Confirm</Text>
