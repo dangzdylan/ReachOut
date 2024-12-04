@@ -1,8 +1,8 @@
 import {React, useState, useEffect} from "react";
-import { View, Image, Text, SafeAreaView, TextInput } from "react-native";
+import { View, Image, Text, SafeAreaView, TextInput, Keyboard } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './ConfigContactsScreen.styles';
-// import { addDoc, collection, update } from "firebase/firestore";
+import { setDoc, addDoc, doc } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
 
@@ -22,14 +22,14 @@ export default function ConfigContactsScreen({navigation, route}) {
     // Function to dismiss keyboard when input is complete
     const handleSubmitEditing = () => {
         Keyboard.dismiss();
-        addNumContactsToFirebase(userId, inputNumber)
     };
 
-    async function addNumContactsToFirebase(userId, recommendNumberInput) {
+    async function addNumContactsToFirebase() {
         try {
-            const newDocRef = doc(db, "users", emailText)
-            await setDoc(newDocRef, {recommendNumber: recommendNumberInput, lastRecommended: new Date()})  
-        console.log(`Number of contacts ${numContactInput} added successfully`);
+            console.log('===========here')
+            const newDocRef = doc(db, "users", userId)
+            await setDoc(newDocRef, {recommendNumber: inputNumber, lastRecommended: new Date()}, { merge: true })  
+        console.log(`Number of contacts ${inputNumber} added successfully`);
         } catch (error) {
             console.error('Error adding field: ', error);
         }
@@ -59,8 +59,9 @@ export default function ConfigContactsScreen({navigation, route}) {
                     style={styles.button}
                     onPress={() => {
                         console.log('Confirmed number:', inputNumber);
+                        addNumContactsToFirebase()
                         // nav to home screen
-                        navigation.navigate("HomeScreen", {name: name, uid: userId, lastRecommended: inputNumber})
+                        navigation.navigate("HomeScreen", {name: name, email: userId, lastRecommended: inputNumber})
                     }}
                 >
                     <Text style={styles.buttonText}>Confirm</Text>
