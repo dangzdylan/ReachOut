@@ -37,9 +37,9 @@ export default function ContactListScreen({ navigation, route}) {
       <Ionicons name="person-circle-outline" size={30} />
       <Text style={styles.contactName}>{"  " + item[1].name}</Text>
       <TouchableOpacity onPress={() => { 
-        navigation.navigate('Profile', { uid: item[2], contactPhone: item[1]["phone"], contactName: item[1]["name"], name: name, recommendNumber: recommendNumber }); 
+        navigation.navigate('Profile', { uid: item[2], contactPhone: item[1]["phone"], contactName: item[1]["name"], name: name, recommendNumber: recommendNumber, lastScreen : "ContactList"}); 
         }}>
-        <Ionicons name="information-circle-outline" size={30} />
+        <Ionicons name="information-circle-outline" size={40} />
       </TouchableOpacity>
     </View>
   );

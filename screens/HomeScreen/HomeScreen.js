@@ -93,7 +93,7 @@ const HomeScreen = ({ navigation, route }) => {
   }, [])
 
   const navigateToProfile = (index, item) => {
-    navigation.navigate("Profile", {uid: email, contactPhone: recommendedContactPhones[index], contactName: item, name: name, recommendNumber: recommendNumber})
+    navigation.navigate("Profile", {uid: email, contactPhone: recommendedContactPhones[index], contactName: item, name: name, recommendNumber: recommendNumber, lastScreen: "HomeScreen"})
   }
 
   const renderChecklistItem = ({ item, index }) => (

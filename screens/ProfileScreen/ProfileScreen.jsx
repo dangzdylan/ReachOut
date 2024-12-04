@@ -7,7 +7,7 @@ import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/fire
 
 const ProfileScreen = ( {navigation, route} ) => {
   
-  const {uid, contactPhone, contactName, name, recommendNumber} = route.params;
+  const {uid, contactPhone, contactName, name, recommendNumber, lastScreen} = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
   //const [profileNotes, setProfileNotes] = useState()
@@ -144,7 +144,7 @@ const ProfileScreen = ( {navigation, route} ) => {
   };
 
   const handleGoBack = () => {
-    navigation.navigate('HomeScreen', {name: name, email: uid, recommendNumber: recommendNumber});
+    navigation.navigate(lastScreen, {name: name, email: uid, recommendNumber: recommendNumber});
   };
 
   const handleAddEntry = () => {
