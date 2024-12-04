@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react"; // Add useState to the import
+import { Modal, Button, View, Text, SafeAreaView } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { styles } from './ImportContactsScreenStyles';
 import * as Contacts from 'expo-contacts';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
@@ -19,9 +22,8 @@ export default function ImportContactsScreen({ navigation, route }) {
 
         const importedContacts = data.map(contact => ({
           name: contact.name,
-          phone: contact.phoneNumbers?.[0]?.number || "",
-          chosen: false,
-          notes: contact.notes || "",
+          phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
+          chosen : false,
         }));
 
         console.log("=====Imported Contacts:", importedContacts[0]);
@@ -52,10 +54,9 @@ async function addContactsToFirestore(userId, importedContacts) {
     const { name, phone, chosen } = contact;
 
     const contactData = {
-      name,
-      phone,
-      chosen,
-      notes: contact.notes || "",
+      name: name,     // Name field
+      phone: phone,   // Phone field
+      chosen: chosen,
     };
 
     try {

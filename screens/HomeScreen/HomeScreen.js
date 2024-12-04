@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import ChecklistComponent from './ChecklistComponent';
+import { styles } from './HomeScreen.styles';
+
 
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy, updateDoc} from "firebase/firestore";
@@ -68,8 +70,8 @@ const HomeScreen = ({ navigation, route }) => {
         });
 
         //IF IT IS A NEW DAY
-        if (timeDifference >= 60000){ //replace conditional with currentTimeStampDay!==lastTimestampDay  for 24 hrs
-          console.log("=======here")
+        if (currentTimeStampDay!==lastTimestampDay){
+          console.log("# of recommended:",recommendNumber)
           for (let i = 0; i < recommendNumber; i++) {
             // Generate a random number between min and max (inclusive)
             let randomNumber = Math.floor(Math.random() * numberOfContacts);
@@ -103,13 +105,15 @@ const HomeScreen = ({ navigation, route }) => {
 
   return (
       <View style={styles.container}>
+          {/* <Image source={require('./assets/ROlogo.png')} /> */}
+
           <View style={styles.logoContainer}>
               <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
-                <Text style={styles.logo}>Contacts</Text>
+                <Text style={styles.icon}>👥</Text>
               </TouchableOpacity>
           </View>
           <View style={styles.greetingContainer}>
-              <Text style={styles.greetingText}>Hi {name.split(" ")[0]}</Text>
+              <Text style={styles.subtitle}>Hi {name.split(" ")[0]},</Text>
           </View>
           <View style={styles.titleContainer}>
               <Text style={styles.title}>Today's Talks</Text>
@@ -126,44 +130,3 @@ const HomeScreen = ({ navigation, route }) => {
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flex: 1,
-    backgroundColor: 'white',
-    marginTop: 30,
-    padding: 10
-  },
-  logoContainer: {
-    display: "flex"
-  },
-  logo: {
-    fontSize: 15,
-    textAlign: "right",
-  },
-  greetingText: {
-    fontSize: 30,
-  },
-  titleContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 35,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  underlinedTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-    marginVertical: 15,
-  },
-  checklistContainer: {
-    width: '100%',
-    gap: 12,
-  }
-});
