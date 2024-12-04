@@ -5,7 +5,10 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './ImportContactsScreen.styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default function ImportContactsScreen({ navigation }) {
+export default function ImportContactsScreen({ navigation, route }) {
+
+
+  const {uid} = route.params //THIS IS WHAT YOU GET FROM PREVIOUS SCREEEN
 
   // Define the modal visibility state
   const [isModalVisible, setIsModalVisible] = useState(false);
