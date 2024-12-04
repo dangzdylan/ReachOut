@@ -2,6 +2,9 @@ import {React, useState, useEffect} from "react";
 import { View, Image, Text, SafeAreaView, TextInput } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './ConfigContactsScreen.styles';
+// import { addDoc, collection, update } from "firebase/firestore";
+import { db } from '../../firebaseConfig';
+
 
 export default function ConfigContactsScreen({navigation, route}) {
     const {uid} = route.params
@@ -11,15 +14,29 @@ export default function ConfigContactsScreen({navigation, route}) {
     // TODO add time stamp
     const handleNumberChange = (value) => {
         // only allow numeric values
-        const numericValue = value.replace(/[^0-9]/g, '');
-        setInputNumber(numericValue);
-        console.log('=======Number entered:', numericValue);
+        const recommendNumber = value.replace(/[^0-9]/g, '');
+        setInputNumber(recommendNumber);
+        console.log('=======Number entered:', recommendNumber);
     };
 
     // Function to dismiss keyboard when input is complete
     const handleSubmitEditing = () => {
         Keyboard.dismiss();
+        addNumContactsToFirebase(userId, numContacts)
     };
+
+    async function addNumContactsToFirebase(userId, recommendNumberInput) {
+        try {
+            const docRef = firestore().collection(db, "users").doc(userId);
+            await docRef.update({
+            recommendNumber: recommendNumberInput, 
+            lastRecommended: new Date(),
+            });
+        console.log(`Number of contacts ${numContactInput} added successfully`);
+        } catch (error) {
+            console.error('Error adding field: ', error);
+        }
+      }
 
     return (
         <SafeAreaView style={styles.container}>

@@ -12,6 +12,17 @@ export default function ImportContactsScreen({ navigation, route }) {
   const {uid} = route.params
   const userId = uid
   // const userId = "userId1";  // Replace with the actual userId
+
+  async function createNewCollection() {
+    try {
+      const newCollectionRef = collection(db, "newCollectionName");
+      const docRef = await addDoc(newCollectionRef, { field1: "value1", field2: "value2" });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
+
   // Request permission, fetch contacts
   useEffect(() => {
     (async () => {
@@ -72,10 +83,10 @@ async function addContactsToFirestore(userId, importedContacts) {
 
     // Prepare the contact data to be added
     const contactData = {
-      Name: name,     // Name field
-      Phone: phone,   // Phone field
-      Chosen: chosen,
-      Notes: contact.notes || "",  // Notes field, if available
+      name: name,     // Name field
+      phone: phone,   // Phone field
+      chosen: chosen,
+      notes: contact.notes || "",  // Notes field, if available
     };
 
     try {
