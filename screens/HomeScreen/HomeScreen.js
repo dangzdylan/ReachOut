@@ -98,7 +98,7 @@ const HomeScreen = ({ navigation, route }) => {
   }
 
   const renderChecklistItem = ({ item, index }) => (
-    <ChecklistComponent name={item} goToProfile={() => navigateToProfile(index, item)} />
+    <ChecklistComponent name={item} goToProfile={() => navigateToProfile(index, item)}/>
   );
 
   return (
