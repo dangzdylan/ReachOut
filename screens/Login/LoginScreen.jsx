@@ -56,9 +56,9 @@ function LoginScreen({navigation}) {
    <SafeAreaView style={styles.container}>
      <View style={styles.content}>
        <Text style={styles.titleText}>Login/Register</Text>
-       <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email"/>
-       <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="Name"/>
-       <TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" secureTextEntry={true}/>
+       <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
+       <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="Name" placeholderTextColor="gray"/>
+       <TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" placeholderTextColor="gray" secureTextEntry={true}/>
        <View style={styles.buttonContainer}>
          <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>
            <Text style={styles.buttonText}>Log in/Register</Text>
