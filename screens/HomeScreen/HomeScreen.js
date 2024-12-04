@@ -70,7 +70,7 @@ const HomeScreen = ({ navigation, route }) => {
         });
 
         //IF IT IS A NEW DAY
-        if (currentTimeStampDay!==lastTimestampDay){
+        if (timeDifference>=60000){ //replace conditional with currentTimeStampDay!==lastTimestampDay
           console.log("# of recommended:",recommendNumber)
           for (let i = 0; i < recommendNumber; i++) {
             // Generate a random number between min and max (inclusive)
