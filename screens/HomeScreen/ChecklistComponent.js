@@ -1,15 +1,19 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
 
-const ChecklistComponent = () => {
+const ChecklistComponent = (props) => {
+
+    const [checkmarkColor, setCheckMarkColor] = useState("#FFFFFF")
+
     return (
-        <TouchableOpacity style={styles.container} onPress={() => console.log("Going to profile screen")}>
+        <TouchableOpacity style={styles.container} onPress={() => props.goToProfile()}>
             <View style={styles.pictureContainer}>
                 <Text style={styles.pictureText}>Picture</Text>
             </View>
             <View style={styles.nameContainer}>
-                <Text style={styles.nameText}>Name</Text>
+                <Text style={styles.nameText}>{props.name}</Text>
             </View>
-            <TouchableOpacity style={styles.checkmarkContainer}>
+            <TouchableOpacity style={[styles.checkmarkContainer, {backgroundColor: checkmarkColor}]} onPress={() => setCheckMarkColor("#FFFCC9")}>
                 <Text style={styles.checkmarkText}>✔</Text>
             </TouchableOpacity>
         </TouchableOpacity>
@@ -56,7 +60,6 @@ const styles = StyleSheet.create({
       width: 30,
       height: 30,
       borderRadius: 15,
-      backgroundColor: '#FFFFFF',
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1.5,

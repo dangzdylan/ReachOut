@@ -5,7 +5,10 @@ import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView} from
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
 
-const ProfileScreen = ( {navigation, ...props} ) => {
+const ProfileScreen = ( {navigation, route} ) => {
+  
+  const {uid, contactPhone, contactName} = route.params;
+
   const [modalVisible, setModalVisible] = useState(false);
   //const [profileNotes, setProfileNotes] = useState()
   const [dateNotes, setDateNotes] = useState([])
@@ -24,7 +27,7 @@ const ProfileScreen = ( {navigation, ...props} ) => {
       try {
         // Reference to the user's document
         const userRef = collection(db, "users");
-        const userQuery = query(userRef, where("email", "==", props.uid));
+        const userQuery = query(userRef, where("email", "==", uid));
         const userQuerySnapshot = await getDocs(userQuery)
 
         // Get the user document (we assume there is only one user document matching the uid)
@@ -41,7 +44,7 @@ const ProfileScreen = ( {navigation, ...props} ) => {
         contactsSnapshot.forEach(async (contactDoc) => {
           const contactData = contactDoc.data();
 
-          if (contactData.phone==props.contactPhone){
+          if (contactData.phone==contactPhone){
             // Reference to the notes subcollection for each contact
             const notesRef = collection(contactDoc.ref, "notes");
 
@@ -93,7 +96,7 @@ const ProfileScreen = ( {navigation, ...props} ) => {
       const usersRef = collection(db, "users");
   
       // Query to find the user document by email (uid)
-      const userQuery = query(usersRef, where("email", "==", props.uid));
+      const userQuery = query(usersRef, where("email", "==", uid));
       const userQuerySnapshot = await getDocs(userQuery);
   
       // Get the user document (we expect only one result since email should be unique)
@@ -104,7 +107,7 @@ const ProfileScreen = ( {navigation, ...props} ) => {
       const contactsRef = collection(userRef, "contacts");
   
       // Query to find the contact document by phone number
-      const contactQuery = query(contactsRef, where("phone", "==", props.contactPhone));
+      const contactQuery = query(contactsRef, where("phone", "==", contactPhone));
       const contactQuerySnapshot = await getDocs(contactQuery);
   
       // Get the first contact document (since phone number is unique for each contact)
@@ -155,13 +158,16 @@ const ProfileScreen = ( {navigation, ...props} ) => {
   
   return (
     <View style={styles.container}>
+      {/*
       <Image
         source={{
           uri: 'https://via.placeholder.com/150', // Replace this with the URL of the dog image
         }}
         style={styles.image}
       />
-      <Text style={styles.name}>{props.contactName}</Text>
+      */
+      }
+      <Text style={styles.name}>{contactName}</Text>
       <TouchableOpacity style={styles.button} onPress={handleReachOut}>
         <Text style={styles.buttonText}>Reach Out!</Text>
       </TouchableOpacity>

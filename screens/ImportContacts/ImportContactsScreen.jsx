@@ -67,7 +67,7 @@ export default function ImportContactsScreen({ navigation, route }) {
         <Text style={styles.title}>Import Contacts</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("ConfigContacts")}
+          onPress={() => navigation.navigate("ConfigContacts", {uid: userId})}
           >
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
