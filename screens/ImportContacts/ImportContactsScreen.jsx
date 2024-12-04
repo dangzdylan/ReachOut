@@ -8,8 +8,10 @@ import * as Contacts from 'expo-contacts';
 import { addDoc, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
-export default function ImportContactsScreen({ navigation, ...props }) {
-  const userId = "userId1";  // Replace with the actual userId
+export default function ImportContactsScreen({ navigation, route }) {
+  const {uid} = route.params
+  const userId = uid
+  // const userId = "userId1";  // Replace with the actual userId
   // Request permission, fetch contacts
   useEffect(() => {
     (async () => {
@@ -26,6 +28,7 @@ export default function ImportContactsScreen({ navigation, ...props }) {
         const importedContacts = data.map(contact => ({
           name: contact.name,
           phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
+          // TODO: notes collection instead of field
           notes: contact.notes || "",  // Notes field (if available)
         }));
 
