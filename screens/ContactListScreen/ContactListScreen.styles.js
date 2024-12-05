@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'white',
+      backgroundColor: '#AEBAEB',
       paddingHorizontal: 20,
       paddingTop: 60,
     },
@@ -53,9 +53,9 @@ const styles = StyleSheet.create({
    },
    searchBar: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15,
     marginBottom: 10,
     paddingLeft: 10,
     backgroundColor: '#fff',

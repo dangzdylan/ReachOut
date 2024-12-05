@@ -72,6 +72,7 @@ export default function ContactListScreen({ navigation, route }) {
           <TextInput
             style={styles.searchBar}
             placeholder="Search contacts"
+            placeholderTextColor="gray"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />

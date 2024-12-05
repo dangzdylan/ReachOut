@@ -77,7 +77,7 @@ const HomeScreen = ({ navigation, route }) => {
           console.log("# of recommended:",recommendNumber)
           let randomNumberList = []
           let i = 0
-          while (i < recommendNumber) {
+          while (i < recommendNumber && i < entireContactPhoneList.length) {
             // Generate a random number between min and max (inclusive)
             let randomNumber = Math.floor(Math.random() * numberOfContacts);
             if (!randomNumberList.includes(randomNumber)) {
