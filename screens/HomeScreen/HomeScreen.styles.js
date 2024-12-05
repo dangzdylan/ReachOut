@@ -59,6 +59,9 @@ export const styles = StyleSheet.create({
     image: "./assets/ROlogo.png",
     textAlign: 'right'
   },
+  checklistContainer: {
+    
+  }
 });
 
 export default styles;

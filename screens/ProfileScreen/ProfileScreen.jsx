@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ProfileScreen.styles';
 import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking, ActivityIndicator} from 'react-native';
-
+import { Ionicons } from '@expo/vector-icons';
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
 
@@ -187,6 +187,7 @@ const ProfileScreen = ( {navigation, route} ) => {
           />
           */
           }
+          <Ionicons name="person-circle-outline" size={130} />
           <Text style={styles.name}>{contactName}</Text>
           <TouchableOpacity style={styles.button} onPress={handleReachOut}>
             <Text style={styles.buttonText}>Reach Out!</Text>
