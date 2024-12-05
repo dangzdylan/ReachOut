@@ -28,11 +28,11 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: 'white',
+    backgroundColor: '#AEBAEB',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,
-    borderWidth: 1,
+    borderWidth: 2.5,
     borderColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
@@ -41,17 +41,17 @@ export const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: '#000000',
-    fontWeight: '400',
+    fontWeight: 'bold',
   },
   input: {
     width: '100%', // Full width of the container
     height: 50, // Increase the height for a rounded look
     borderColor: '#ccc', // Light gray border
-    borderWidth: 1,
+    borderWidth: 2.5,
     borderRadius: 25, // Rounded corners
     paddingHorizontal: 15, // Space inside the input
     marginBottom: 15, // Space between inputs
-    backgroundColor: '#f9f9f9', // Light gray background
+    backgroundColor: '#FFFFFF', // Light gray background
     fontSize: 16, // Adjust text size
     color: '#000000',
   }

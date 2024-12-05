@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { View, Text, SafeAreaView, Alert } from "react-native";
+import { View, Text, SafeAreaView, Alert, Image} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from "./LoginScreenStyles";
 //import { useAuthRequest, makeRedirectUri } from "expo-auth-session";
@@ -55,6 +55,7 @@ function LoginScreen({navigation}) {
   return (
    <SafeAreaView style={styles.container}>
      <View style={styles.content}>
+     <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
        <Text style={styles.titleText}>Login/Register</Text>
        <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
        <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="Name" placeholderTextColor="gray"/>

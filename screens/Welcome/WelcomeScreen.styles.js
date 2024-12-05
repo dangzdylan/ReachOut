@@ -17,15 +17,17 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#000000',
   },
   subtitle: {
-    fontSize: 18,
-    color: '#666666',
+    fontSize: 24,
+    color: '#000000',
     textAlign: 'center',
+    fontWeight: 'bold',
+    marginTop: 10,
   },
   button: {
     backgroundColor: 'white',

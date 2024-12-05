@@ -3,6 +3,7 @@ import { View, Image, Text, SafeAreaView } from "react-native";
 import {useNavigation} from '@react-navigation/native';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './WelcomeScreen.styles';
+import { AntDesign } from '@expo/vector-icons';
 
 
 export default function WelcomeScreen(props) {
@@ -21,6 +22,7 @@ export default function WelcomeScreen(props) {
       <View style={styles.content}>
         <View style={styles.textContainer}>
             <Text style={styles.title}>Hello!</Text>
+            <AntDesign name="smile-circle" size={30} />
             <Text style={styles.subtitle}>Let's reach out!</Text>
         </View>
         {/* <Image source={require('./assets/ROlogo.png')} /> */}
