@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     
     modalContainer: {
       flex: 1,
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
     },
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.25,
       shadowRadius: 4,
       elevation: 5,
+      marginTop: '25%',
     },
     
     modalTitle: {

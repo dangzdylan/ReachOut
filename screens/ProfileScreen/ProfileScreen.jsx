@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ProfileScreen.styles';
-import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking, ActivityIndicator} from 'react-native';
+import { Text, View, Image, TouchableOpacity, TextInput, Modal, ScrollView, Linking, ActivityIndicator, Keyboard} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy} from "firebase/firestore";
@@ -173,7 +173,6 @@ const ProfileScreen = ( {navigation, route} ) => {
       .catch((err) => console.error('Error opening SMS:', err));
   }
 
-  
   return (
     <View style={styles.container}>
       {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
@@ -226,10 +225,13 @@ const ProfileScreen = ( {navigation, route} ) => {
                 {/* Text Input for Notes */}
                 <TextInput
                   style={styles.modalInput}
-                  multiline
                   value={inputText}
                   returnKeyType="done"
+                  multiline
                   onChangeText={(text) => setInputText(text)}
+                  onSubmitEditing={() => {
+                    Keyboard.dismiss();
+                  }}
                 />
                 
                 <Text style={styles.dateText}>
