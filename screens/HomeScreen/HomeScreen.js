@@ -31,12 +31,12 @@ const HomeScreen = ({ navigation, route }) => {
 
         userData = userDoc.data();
         //console.log(userData)
-        //let lastTimestampDay = userData.lastRecommended.toDate().toDateString() //this is for 24 hr
-        let lastTimestamp = userData.lastRecommended.toDate() //remove this for 24 hr
+        let lastTimeStampDay = userData.lastRecommended.toDate().toDateString() //this is for 24 hr
+        //let lastTimestamp = userData.lastRecommended.toDate() //remove this for 24 hr
         //console.log(lastTimestampDay)
-        //let currentTimeStampDay = new Date().toDateString() //this is for 24 hr
-        let currentTimeStamp = new Date() //remove this for 24 hr
-        let timeDifference = currentTimeStamp - lastTimestamp //remove this for 24 hr
+        let currentTimeStampDay = new Date().toDateString() //this is for 24 hr
+        //let currentTimeStamp = new Date() //remove this for 24 hr
+        //let timeDifference = currentTimeStamp - lastTimestamp //remove this for 24 hr
 
         // Reference to the contacts subcollection
         const contactsRef = collection(userDoc.ref, "contacts");
@@ -60,7 +60,7 @@ const HomeScreen = ({ navigation, route }) => {
           entireContactNameList.push(contactData.name)
 
           if (contactData.chosen) {
-            if (timeDifference < 60000){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
+            if (currentTimeStampDay===lastTimeStampDay){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
               recommendedContactPhoneList.push(contactData.phone)
               recommendedContactNameList.push(contactData.name)
             } else {
@@ -73,8 +73,7 @@ const HomeScreen = ({ navigation, route }) => {
         });
 
         //IF IT IS A NEW DAY
-        if (timeDifference>=60000){ //replace conditional with currentTimeStampDay!==lastTimestampDay
-          console.log("# of recommended:",recommendNumber)
+        if (currentTimeStampDay!==lastTimeStampDay){ //replace conditional with currentTimeStampDay!==lastTimestampDay
           let randomNumberList = []
           let i = 0
           while (i < recommendNumber && i < entireContactPhoneList.length) {
