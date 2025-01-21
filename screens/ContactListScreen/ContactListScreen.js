@@ -1,30 +1,27 @@
 import { React, useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './ContactListScreen.styles';
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, deleteDoc } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
 export default function ContactListScreen({ navigation, route }) {
   const { name, email, recommendNumber } = route.params;
 
   const [contactList, setContactList] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');  // State for the search query
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
   const userId = email;
 
-  const [loading, setLoading] = useState(true)
-
-  // Function to filter contacts based on search query (prefix match)
   const filteredContacts = contactList.filter(contact =>
     contact[1].name.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
     contact[1].phone.includes(searchQuery)
   );
 
-
-  // Grab contacts of current user
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     const getData = async () => {
       const ref = doc(db, "users", userId);
       const uid = (await getDoc(ref)).data()["email"];
@@ -35,17 +32,37 @@ export default function ContactListScreen({ navigation, route }) {
       });
 
       setContactList(newContacts);
-      setLoading(false)
+      setLoading(false);
     };
 
     getData();
   }, [userId]);
 
-  // Subcomponent for each contact
+  // Function to delete a contact
+  const deleteContact = async (contactId) => {
+    try {
+      const userRef = doc(db, "users", userId);
+      const contactRef = doc(userRef, "contacts", contactId);
+
+      await deleteDoc(contactRef); // Delete from Firestore
+      setContactList(prevContacts => prevContacts.filter(contact => contact[0] !== contactId)); // Update state
+      Alert.alert('Success', 'Contact deleted successfully.');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete the contact.');
+      console.error("Error deleting contact: ", error);
+    }
+  };
+
   const renderContact = ({ item }) => (
     <View style={styles.contactItem}>
       <Ionicons name="person-circle-outline" size={30} />
       <Text style={styles.contactName}>{"  " + item[1].name}</Text>
+
+      {/* Delete Button */}
+      <TouchableOpacity onPress={() => deleteContact(item[0])}>
+        <Ionicons name="trash-outline" size={30} color="red" />
+      </TouchableOpacity>
+
       <TouchableOpacity onPress={() => {
         navigation.navigate('Profile', {
           uid: item[2],
@@ -61,7 +78,6 @@ export default function ContactListScreen({ navigation, route }) {
     </View>
   );
 
-  // Display contacts
   return (
     <View style={styles.container}>
       {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
@@ -98,4 +114,3 @@ export default function ContactListScreen({ navigation, route }) {
     </View>
   );
 }
-
