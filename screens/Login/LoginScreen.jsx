@@ -9,6 +9,7 @@ import { db } from "../../firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 //import { GoogleSignin } from "@react-native-google-signin/google-signin";
 //import auth from "@react-native-firebase/auth";
+import SHA256 from 'crypto-js/sha256';
 /*
 
 GoogleSignin.configure({
@@ -39,6 +40,10 @@ function LoginScreen({navigation}) {
 
   const confirmPasswordHandler = (input) => {
     setConfirmPasswordText(input)
+  }
+
+  const encryptPassword = (password) => {
+    return SHA256(password).toString();
   }
 
   const verifyRegistration = () => {
@@ -78,7 +83,8 @@ function LoginScreen({navigation}) {
       Alert.alert("Error", "Email does not exist!");
       return false;
     }
-    if (docSnap.data().password !== passwordText) {
+    const encryptedPassword = encryptPassword(passwordText);
+    if (docSnap.data().password !== encryptedPassword) {
       setPasswordText("")
       Alert.alert("Error", "Password is incorrect!");
       return false;
@@ -86,13 +92,18 @@ function LoginScreen({navigation}) {
     return [docSnap.data().recommendNumber, docSnap.data().name]
   }
 
-  const buttonPressHandler = async() => { //make this async later
+  const buttonPressHandler = async() => {
     let verified = false
     if (onRegister) {
       verified = verifyRegistration()
       if (verified) {
+        const encryptedPassword = encryptPassword(passwordText);
         const newDocRef = doc(db, "users", emailText)
-        await setDoc(newDocRef, {email: emailText, name: nameText, password: passwordText})
+        await setDoc(newDocRef, {
+          email: emailText, 
+          name: nameText, 
+          password: encryptedPassword
+        })
         navigation.navigate("ImportContacts", {uid: emailText, name: nameText})
       }
     } else {
