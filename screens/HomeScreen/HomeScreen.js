@@ -74,6 +74,18 @@ const HomeScreen = ({ navigation, route }) => {
 
         //IF IT IS A NEW DAY
         if (currentTimeStampDay!==lastTimeStampDay){ //replace conditional with currentTimeStampDay!==lastTimestampDay
+          // First, reset all checkmarked fields
+          const allContactsSnapshot = await getDocs(contactsRef);
+          for (const doc of allContactsSnapshot.docs) {
+            const contactData = doc.data();
+            if ('checkmarked' in contactData && contactData.checkmarked) {
+              await updateDoc(doc.ref, {
+                checkmarked: false
+              });
+            }
+          }
+
+          // Then proceed with random selection
           let randomNumberList = []
           let i = 0
           while (i < recommendNumber && i < entireContactPhoneList.length) {
@@ -86,7 +98,7 @@ const HomeScreen = ({ navigation, route }) => {
               querySnapshot = await getDocs(phoneQuery)
               let docWanted = querySnapshot.docs[0]
               await updateDoc(docWanted.ref, {
-                chosen: true // Use new Date() if you prefer a Date object
+                chosen: true
               });
               randomNumberList.push(randomNumber)
               i+=1
@@ -110,7 +122,11 @@ const HomeScreen = ({ navigation, route }) => {
   }
 
   const renderChecklistItem = ({ item, index }) => (
-    <ChecklistComponent name={item} goToProfile={() => navigateToProfile(index, item)}/>
+    <ChecklistComponent 
+      name={item} 
+      email={email}
+      goToProfile={() => navigateToProfile(index, item)}
+    />
   );
 
   return (
