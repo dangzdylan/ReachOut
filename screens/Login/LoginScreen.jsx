@@ -1,6 +1,6 @@
 import React from "react";
-import { useState } from "react";
-import { View, Text, SafeAreaView, Alert, Image, Linking} from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, SafeAreaView, Alert, Image, Linking, ActivityIndicator} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from "./LoginScreenStyles";
 //import { useAuthRequest, makeRedirectUri } from "expo-auth-session";
@@ -10,7 +10,8 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 //import { GoogleSignin } from "@react-native-google-signin/google-signin";
 //import auth from "@react-native-firebase/auth";
 import SHA256 from 'crypto-js/sha256';
-import email from "react-native-email";
+//import email from "react-native-email";
+import { saveSession, getSession } from "./AuthService.js";
 /*
 
 
@@ -21,6 +22,7 @@ GoogleSignin.configure({
 
 */
 function LoginScreen({navigation}) {
+  const [loading, setLoading] = useState(true)
   const [emailText, setEmailText] = useState("")
   const [passwordText, setPasswordText] = useState("")
   const [nameText, setNameText] = useState("")
@@ -30,6 +32,22 @@ function LoginScreen({navigation}) {
   const [alternateText, setAlternateText] = useState("Don't have an account? Create One!")
   const [title, setTitle] = useState("Log in")
 
+  useEffect(() => {
+    const loadSession = async () => {
+      const token = await getSession();
+      if (token) {
+        const docRef = doc(db, "users", token);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setLoading(false)
+          navigation.navigate("HomeScreen", {name: docSnap.data().name, email: token, recommendNumber: docSnap.data().recommendNumber})
+        }
+      }
+      setLoading(false)
+    };
+
+    loadSession();
+  }, []);
 
   const emailHandler = (input) => {
     setEmailText(input)
@@ -113,7 +131,7 @@ function LoginScreen({navigation}) {
     return [data.recommendNumber, data.name]
   }
   /*
-  const verificationCode = () => {
+  const getToken = () => {
     // Generate a random 5-character verification code
     const generateRandomCode = () => {
       const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -138,7 +156,8 @@ function LoginScreen({navigation}) {
 
     const randomSubset = getRandomSubset(encryptedCode.length, 5);
     return randomSubset.join('');
-  } */
+  }
+  */
 
 
   const buttonPressHandler = async() => {
@@ -155,22 +174,7 @@ function LoginScreen({navigation}) {
       }
       Alert.alert("Next Steps", "Please email reachoutadrv@gmail.com with THIS email address and inform us that you have forgotten your password. We will provide you with next steps.")
       return;
-      /*
-      const code = verificationCode();
-      console.log("VERIFICATION CODE: ", code);
-      const newDocRef = doc(db, "users", emailText)
-      updateDoc(newDocRef, {
-        code: code,
-        codeExpiration: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
-      })
-      Linking.openURL(`mailto:${emailText}?subject=Reset Password&body=Your verification code is: ${code}`).catch(err => console.error('Failed to open email', err));
-      /*
-      const to = ['example@example.com']; // List of recipients
-      email(to, {
-        subject: 'Hello from React Native',
-        body: 'This is a test email.',
-      }).catch(console.error);
-      */
+
     } else {
       let verified = false
       if (onRegister) {
@@ -188,6 +192,7 @@ function LoginScreen({navigation}) {
       } else {
         verified = await verifyLogin()
         if (verified) {
+          await saveSession(emailText);
           navigation.navigate("HomeScreen", {name: verified[1], email: emailText, recommendNumber: verified[0]}) //const {name, email, recommendNumber} = route.params
         }
       }
@@ -230,33 +235,39 @@ function LoginScreen({navigation}) {
 
 
   return (
-   <SafeAreaView style={styles.container}>
-     <View style={styles.content}>
-        <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
-        <Text style={styles.titleText}>{title}</Text>
-        <TouchableOpacity onPress={() => changeToRegisterOrLogin()} style={styles.createAccount}>
-          <Text style={styles.createAccountText}>{alternateText}</Text>
-        </TouchableOpacity>
-        <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
-        {onRegister && (
-          <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="First Name" placeholderTextColor="gray"/>
-        )}
-        {!forgotPassword && (<TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" placeholderTextColor="gray" secureTextEntry={true}/>)}
-        {onRegister && (
-          <TextInput value={confirmPasswordText} onChangeText={confirmPasswordHandler} style={styles.input} placeholder="Confirm Password" placeholderTextColor="gray" secureTextEntry={true}/>
-        )}
-        {!onRegister && !forgotPassword && (
-          <TouchableOpacity onPress={forgotPasswordHandler} style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>
-            <Text style={styles.buttonText}>{!forgotPassword ? title : "Reset Password"}</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
         </View>
-     </View>
-   </SafeAreaView>
+      ) : (
+        <View style={styles.content}>
+          <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
+          <Text style={styles.titleText}>{title}</Text>
+          <TouchableOpacity onPress={() => changeToRegisterOrLogin()} style={styles.createAccount}>
+            <Text style={styles.createAccountText}>{alternateText}</Text>
+          </TouchableOpacity>
+          <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
+          {onRegister && (
+            <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="First Name" placeholderTextColor="gray"/>
+          )}
+          {!forgotPassword && (<TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" placeholderTextColor="gray" secureTextEntry={true}/>)}
+          {onRegister && (
+            <TextInput value={confirmPasswordText} onChangeText={confirmPasswordHandler} style={styles.input} placeholder="Confirm Password" placeholderTextColor="gray" secureTextEntry={true}/>
+          )}
+          {!onRegister && !forgotPassword && (
+            <TouchableOpacity onPress={forgotPasswordHandler} style={styles.forgotPassword}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+          )}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>
+              <Text style={styles.buttonText}>{!forgotPassword ? title : "Reset Password"}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </SafeAreaView>
  );
 }
 
