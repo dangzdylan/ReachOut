@@ -46,7 +46,7 @@ function LoginScreen({navigation}) {
     return SHA256(password).toString();
   }
 
-  const verifyRegistration = () => {
+  const verifyRegistration = async() => {
     if (!emailText || !passwordText || !confirmPasswordText || !nameText) {
       Alert.alert("Error", "All fields must be filled out!");
       return false;
@@ -66,6 +66,13 @@ function LoginScreen({navigation}) {
     }
     if (passwordText.length < 8) {
       Alert.alert("Error", "Password must be at least 8 characters long!");
+      return false;
+    }
+    //check if email is already in database
+    const docRef = doc(db, "users", emailText);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()){
+      Alert.alert("Error", "Email already exists!");
       return false;
     }
     return true
@@ -95,7 +102,7 @@ function LoginScreen({navigation}) {
   const buttonPressHandler = async() => {
     let verified = false
     if (onRegister) {
-      verified = verifyRegistration()
+      verified = await verifyRegistration()
       if (verified) {
         const encryptedPassword = encryptPassword(passwordText);
         const newDocRef = doc(db, "users", emailText)
