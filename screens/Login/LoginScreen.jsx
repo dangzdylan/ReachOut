@@ -12,9 +12,11 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import SHA256 from 'crypto-js/sha256';
 /*
 
+
 GoogleSignin.configure({
  webClientId: "863938449545-aqsvif4186h2e20ci9nod0o4euqg71gd.apps.googleusercontent.com",
 });
+
 
 */
 function LoginScreen({navigation}) {
@@ -26,25 +28,31 @@ function LoginScreen({navigation}) {
   const [alternateText, setAlternateText] = useState("Don't have an account? Create One!")
   const [title, setTitle] = useState("Log in")
 
+
   const emailHandler = (input) => {
     setEmailText(input)
   }
+
 
   const nameHandler = (input) => {
     setNameText(input)
   }
 
+
   const passwordHandler = (input) => {
     setPasswordText(input)
   }
+
 
   const confirmPasswordHandler = (input) => {
     setConfirmPasswordText(input)
   }
 
+
   const encryptPassword = (password) => {
     return SHA256(password).toString();
   }
+
 
   const verifyRegistration = async() => {
     if (!emailText || !passwordText || !confirmPasswordText || !nameText) {
@@ -78,6 +86,7 @@ function LoginScreen({navigation}) {
     return true
   }
 
+
   const verifyLogin = async() => {
     if (!emailText || !passwordText) {
       Alert.alert("Error", "All fields must be filled out!");
@@ -99,6 +108,7 @@ function LoginScreen({navigation}) {
     return [docSnap.data().recommendNumber, docSnap.data().name]
   }
 
+
   const buttonPressHandler = async() => {
     let verified = false
     if (onRegister) {
@@ -107,8 +117,8 @@ function LoginScreen({navigation}) {
         const encryptedPassword = encryptPassword(passwordText);
         const newDocRef = doc(db, "users", emailText)
         await setDoc(newDocRef, {
-          email: emailText, 
-          name: nameText, 
+          email: emailText,
+          name: nameText,
           password: encryptedPassword
         })
         navigation.navigate("ImportContacts", {uid: emailText, name: nameText})
@@ -120,6 +130,7 @@ function LoginScreen({navigation}) {
       }
     }
   }
+
 
   const changeToRegisterOrLogin = () => {
     setEmailText("");
@@ -136,6 +147,7 @@ function LoginScreen({navigation}) {
       setTitle("Log in")
     }
   }
+
 
   return (
    <SafeAreaView style={styles.container}>
@@ -167,6 +179,8 @@ function LoginScreen({navigation}) {
    </SafeAreaView>
  );
 }
+
+
 
 
 export default LoginScreen;
