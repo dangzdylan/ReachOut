@@ -48,5 +48,23 @@ export const styles = StyleSheet.create({
     width: '80',
     height: '80',
     marginBottom: 20,
-  }
+  },
+  forgotPassword: {
+    marginTop: 10, // Add margin if needed
+    alignSelf: 'flex-start', // Aligns the button to the start (left)
+  },
+  forgotPasswordText: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+  },
+  createAccount: {
+    marginTop: 10, // Space above the text
+    marginBottom: 20,
+    alignSelf: 'center', // Center the text horizontally
+  },
+  createAccountText: {
+    color: '#6a5acd', // A darker version of lavender that fits well with the #f9f9f9 background
+    textDecorationLine: 'underline',
+    fontSize: 16, // Adjust font size as needed
+  },
 })
