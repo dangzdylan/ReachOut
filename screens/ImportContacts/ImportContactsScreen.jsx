@@ -61,7 +61,7 @@ async function addContactsToFirestore(userId, importedContacts) {
     try {
       await addDoc(collection(db, "users", userId, "contacts"), contactData);
     } catch (error) {
-      console.error("Error adding contact:", error);
+      // console.error("Error adding contact:", error);
     }
   }
 }
