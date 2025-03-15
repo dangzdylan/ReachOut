@@ -31,12 +31,12 @@ const HomeScreen = ({ navigation, route }) => {
 
         userData = userDoc.data();
         //console.log(userData)
-        //let lastTimestampDay = userData.lastRecommended.toDate().toDateString() //this is for 24 hr
-        let lastTimestamp = userData.lastRecommended.toDate() //remove this for 24 hr
+        let lastTimeStampDay = userData.lastRecommended.toDate().toDateString() //this is for 24 hr
+        //let lastTimestamp = userData.lastRecommended.toDate() //remove this for 24 hr
         //console.log(lastTimestampDay)
-        //let currentTimeStampDay = new Date().toDateString() //this is for 24 hr
-        let currentTimeStamp = new Date() //remove this for 24 hr
-        let timeDifference = currentTimeStamp - lastTimestamp //remove this for 24 hr
+        let currentTimeStampDay = new Date().toDateString() //this is for 24 hr
+        //let currentTimeStamp = new Date() //remove this for 24 hr
+        //let timeDifference = currentTimeStamp - lastTimestamp //remove this for 24 hr
 
         // Reference to the contacts subcollection
         const contactsRef = collection(userDoc.ref, "contacts");
@@ -60,7 +60,7 @@ const HomeScreen = ({ navigation, route }) => {
           entireContactNameList.push(contactData.name)
 
           if (contactData.chosen) {
-            if (timeDifference < 60000){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
+            if (currentTimeStampDay===lastTimeStampDay){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
               recommendedContactPhoneList.push(contactData.phone)
               recommendedContactNameList.push(contactData.name)
             } else {
@@ -73,8 +73,19 @@ const HomeScreen = ({ navigation, route }) => {
         });
 
         //IF IT IS A NEW DAY
-        if (timeDifference>=60000){ //replace conditional with currentTimeStampDay!==lastTimestampDay
-          console.log("# of recommended:",recommendNumber)
+        if (currentTimeStampDay!==lastTimeStampDay){ //replace conditional with currentTimeStampDay!==lastTimestampDay
+          // First, reset all checkmarked fields
+          const allContactsSnapshot = await getDocs(contactsRef);
+          for (const doc of allContactsSnapshot.docs) {
+            const contactData = doc.data();
+            if ('checkmarked' in contactData && contactData.checkmarked) {
+              await updateDoc(doc.ref, {
+                checkmarked: false
+              });
+            }
+          }
+
+          // Then proceed with random selection
           let randomNumberList = []
           let i = 0
           while (i < recommendNumber && i < entireContactPhoneList.length) {
@@ -87,7 +98,7 @@ const HomeScreen = ({ navigation, route }) => {
               querySnapshot = await getDocs(phoneQuery)
               let docWanted = querySnapshot.docs[0]
               await updateDoc(docWanted.ref, {
-                chosen: true // Use new Date() if you prefer a Date object
+                chosen: true
               });
               randomNumberList.push(randomNumber)
               i+=1
@@ -111,7 +122,11 @@ const HomeScreen = ({ navigation, route }) => {
   }
 
   const renderChecklistItem = ({ item, index }) => (
-    <ChecklistComponent name={item} goToProfile={() => navigateToProfile(index, item)}/>
+    <ChecklistComponent 
+      name={item} 
+      email={email}
+      goToProfile={() => navigateToProfile(index, item)}
+    />
   );
 
   return (

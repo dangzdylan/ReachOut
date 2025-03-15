@@ -1,16 +1,79 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
+import { db } from '../../firebaseConfig';
 
 const ChecklistComponent = (props) => {
 
     const [checkmarkColor, setCheckMarkColor] = useState("#FFFFFF")
 
-    const setAColor = () => {
-      if (checkmarkColor==="#FFFFFF") {
-        setCheckMarkColor("#AEBAEB")
-      } else {
-        setCheckMarkColor("#FFFFFF")
+    useEffect(() => {
+        const fetchInitialState = async () => {
+            try {
+                const userRef = collection(db, "users");
+                const userQuery = query(userRef, where("email", "==", props.email));
+                const userQuerySnapshot = await getDocs(userQuery);
+                
+                if (!userQuerySnapshot.empty) {
+                    const userDoc = userQuerySnapshot.docs[0];
+                    const contactsRef = collection(userDoc.ref, "contacts");
+                    const q = query(contactsRef, where("name", "==", props.name));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (!querySnapshot.empty) {
+                        const contactDoc = querySnapshot.docs[0];
+                        const contactData = contactDoc.data();
+                        
+                        // Check if checkmarked field exists
+                        if (!('checkmarked' in contactData)) {
+                            // Initialize the field if it doesn't exist
+                            await updateDoc(contactDoc.ref, {
+                                checkmarked: false
+                            });
+                            setCheckMarkColor("#FFFFFF");
+                        } else {
+                            setCheckMarkColor(contactData.checkmarked ? "#AEBAEB" : "#FFFFFF");
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching initial state:", error);
+            }
+        };
+
+        fetchInitialState();
+    }, [props.email, props.name]);
+
+    const setAColor = async () => {
+      const newColor = checkmarkColor === "#FFFFFF" ? "#AEBAEB" : "#FFFFFF";
+      setCheckMarkColor(newColor);
+      
+      try {
+        const userRef = collection(db, "users");
+        const userQuery = query(userRef, where("email", "==", props.email));
+        const userQuerySnapshot = await getDocs(userQuery);
+        
+        if (!userQuerySnapshot.empty) {
+          const userDoc = userQuerySnapshot.docs[0];
+          const contactsRef = collection(userDoc.ref, "contacts");
+          const q = query(contactsRef, where("name", "==", props.name));
+          const querySnapshot = await getDocs(q);
+          
+          if (!querySnapshot.empty) {
+            const contactDoc = querySnapshot.docs[0];
+            await updateDoc(contactDoc.ref, {
+              checkmarked: newColor === "#AEBAEB"
+            });
+            console.log("Successfully updated checkmarked status for", props.name);
+          } else {
+            console.error("Contact not found:", props.name);
+            setCheckMarkColor(checkmarkColor); // Revert on failure
+          }
+        }
+      } catch (error) {
+        console.error("Error updating checkmarked status:", error);
+        setCheckMarkColor(checkmarkColor); // Revert on failure
       }
     }
 
