@@ -9,6 +9,7 @@ import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import ContactListScreen from '../screens/ContactListScreen/ContactListScreen';
 import SettingsScreen from '../screens/SettingsScreen/SettingsScreen';
 import ChangeContactNumberScreen from '../screens/SettingsScreen/ChangeContactNumberScreen';
+import ChangePasswordScreen from '../screens/SettingsScreen/ChangePasswordScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -57,6 +58,10 @@ const MainStack = () => {
       <Stack.Screen
         name="ChangeContactNumber"
         component={ChangeContactNumberScreen}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
       />
   </Stack.Navigator>
   );
