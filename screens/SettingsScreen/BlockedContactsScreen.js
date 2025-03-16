@@ -49,7 +49,7 @@ export default function BlockedContactsScreen({navigation, route}) {
             <Text style={styles.contactName}>{"  " + item.name}</Text>
             <TouchableOpacity onPress={() => {
                 // Handle unblock or view details
-                // You might want to add functionality to unblock contacts
+                // TODO: add functionality to unblock contacts
             }}>
                 <Ionicons name="remove-circle-outline" size={40} color="red" />
             </TouchableOpacity>
@@ -72,7 +72,7 @@ export default function BlockedContactsScreen({navigation, route}) {
                 
                 {/* Loading indicator or content */}
                 {loading ? (
-                    <ActivityIndicator size="large" color="#0000ff" />
+                    <ActivityIndicator size="medium" color="#0000ff" />
                 ) : (
                     <View style={styles.listContainer}>
                         {blockedContacts.length === 0 ? (
