@@ -134,15 +134,17 @@ const HomeScreen = ({ navigation, route }) => {
           {/* <Image source={require('./assets/ROlogo.png')} /> */}
           {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
             <>
-              <View style={styles.logoContainer}>
-                  <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
-                    <Text style={styles.icon}>
-                  <Ionicons name="people-outline" size={50} />
-                </Text>
-                  </TouchableOpacity>
-              </View>
-              <View style={styles.greetingContainer}>
-                  <Text style={styles.subtitle}>Hi {name.split(" ")[0]}!</Text>
+              <View style={styles.headerContainer}>
+                <View style={styles.greetingContainer}>
+                    <Text style={styles.subtitle}>Hi {name.split(" ")[0]}!</Text>
+                </View>
+                <View style={styles.logoContainer}>
+                    <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
+                      <Text style={styles.icon}>
+                    <Ionicons name="people-outline" size={30} />
+                  </Text>
+                    </TouchableOpacity>
+                </View>
               </View>
               <View style={styles.titleContainer}>
                   <Text style={styles.title}>Today's Talks</Text>
@@ -154,11 +156,10 @@ const HomeScreen = ({ navigation, route }) => {
                     keyExtractor={(item, index) => index.toString()} // Use index as key since names could repeat
                   />
               </View>
-              
               <View style={styles.logoContainer}>
                   <TouchableOpacity onPress={() => {navigation.navigate('Settings', {name: name, email: email, recommendNumber: recommendNumber})}}>
                     <Text style={styles.icon}>
-                  <Ionicons name="people-outline" size={50} />
+                  <Ionicons name="settings-outline" size={30} />
                 </Text>
                   </TouchableOpacity>
               </View>

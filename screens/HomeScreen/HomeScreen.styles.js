@@ -8,6 +8,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 60,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   content: {
     flex: 1,
     justifyContent: 'space-between',
@@ -25,7 +30,7 @@ export const styles = StyleSheet.create({
     textAlign: 'left',
   },
   title: {
-    fontSize: 40,
+    fontSize: 20,
     textDecorationLine: 'underline',
     marginBottom: 10,
     color: '#000000',
@@ -33,7 +38,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 40,
+    fontSize: 20,
     color: '#000000',
     textAlign: 'left',
   },
@@ -60,8 +65,8 @@ export const styles = StyleSheet.create({
     textAlign: 'right'
   },
   checklistContainer: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
 export default styles;
