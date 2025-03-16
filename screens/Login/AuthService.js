@@ -16,3 +16,11 @@ export const getSession = async () => {
     return null;
   }
 };
+
+export const cancelSession = async () => {
+  try {
+    await AsyncStorage.removeItem('userToken');
+  } catch (error) {
+    console.error('Error canceling session:', error);
+  }
+};

@@ -193,6 +193,10 @@ function LoginScreen({navigation}) {
         verified = await verifyLogin()
         if (verified) {
           await saveSession(emailText);
+          setEmailText("");
+          setPasswordText("");
+          setNameText("");
+          setConfirmPasswordText("");
           navigation.navigate("HomeScreen", {name: verified[1], email: emailText, recommendNumber: verified[0]}) //const {name, email, recommendNumber} = route.params
         }
       }
