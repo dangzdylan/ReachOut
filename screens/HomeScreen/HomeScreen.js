@@ -154,6 +154,7 @@ const HomeScreen = ({ navigation, route }) => {
                     keyExtractor={(item, index) => index.toString()} // Use index as key since names could repeat
                   />
               </View>
+              
               <View style={styles.logoContainer}>
                   <TouchableOpacity onPress={() => {navigation.navigate('Settings', {name: name, email: email, recommendNumber: recommendNumber})}}>
                     <Text style={styles.icon}>

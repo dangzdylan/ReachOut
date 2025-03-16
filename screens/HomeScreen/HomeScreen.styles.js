@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
     textAlign: 'right'
   },
   checklistContainer: {
-    
+    flex: 1
   }
 });
 

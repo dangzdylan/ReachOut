@@ -10,6 +10,7 @@ import ContactListScreen from '../screens/ContactListScreen/ContactListScreen';
 import SettingsScreen from '../screens/SettingsScreen/SettingsScreen';
 import ChangeContactNumberScreen from '../screens/SettingsScreen/ChangeContactNumberScreen';
 import ChangePasswordScreen from '../screens/SettingsScreen/ChangePasswordScreen';
+import ChangeNameScreen from '../screens/SettingsScreen/ChangeNameScreen';
 import BlockedContactsScreen from '../screens/SettingsScreen/BlockedContactsScreen';
 
 
@@ -63,6 +64,10 @@ const MainStack = () => {
       <Stack.Screen
         name="ChangePassword"
         component={ChangePasswordScreen}
+      />
+      <Stack.Screen
+        name="ChangeNameScreen"
+        component={ChangeNameScreen}
       />
       <Stack.Screen
         name="BlockedContacts"

@@ -13,7 +13,8 @@ export const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 40,
-    marginBottom: 15
+    marginBottom: 15,
+    textAlign: 'center',
   },
   buttonContainer: {
     width: '100%',
