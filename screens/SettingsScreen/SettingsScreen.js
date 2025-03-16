@@ -25,7 +25,7 @@ export default function SettingsScreen({navigation, route}) {
         },
         {
             title: "Show Blocked Contacts",
-            onPress: () => navigation.navigate("BlockedContactsScreen", { name, email, recommendNumber }),
+            onPress: () => navigation.navigate("BlockedContacts", { name, email, recommendNumber }),
             icon: "ban-outline"
         },
         {
