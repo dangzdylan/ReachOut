@@ -10,12 +10,10 @@ export default function BlockedContactsScreen({navigation, route}) {
     const { name, email, recommendNumber } = route.params;
     const userId = email;
     const [blockedContacts, setBlockedContacts] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // Fetch blocked contacts when component mounts
         const fetchBlockedContacts = async () => {
-            setLoading(true);
             try {
                 const blockedSnapshot = await getDocs(collection(db, "users", userId, "blockedContacts"));
                 if (blockedSnapshot.empty) {
@@ -34,8 +32,6 @@ export default function BlockedContactsScreen({navigation, route}) {
             } catch (error) {
                 console.error("Error getting blocked contacts:", error);
                 setBlockedContacts([]);
-            } finally {
-                setLoading(false);
             }
         };
         
@@ -71,22 +67,18 @@ export default function BlockedContactsScreen({navigation, route}) {
                 </View>
                 
                 {/* Loading indicator or content */}
-                {loading ? (
-                    <ActivityIndicator size="medium" color="#0000ff" />
-                ) : (
-                    <View style={styles.listContainer}>
-                        {blockedContacts.length === 0 ? (
-                            <Text style={styles.noContactsText}>No blocked contacts found.</Text>
-                        ) : (
-                            <FlatList
-                                data={blockedContacts}
-                                keyExtractor={(item) => item.id}
-                                renderItem={renderBlockedContact}
-                                contentContainerStyle={styles.list}
-                            />
-                        )}
-                    </View>
-                )}
+                <View style={styles.listContainer}>
+                    {blockedContacts.length === 0 ? (
+                        <Text style={styles.noContactsText}>No blocked contacts found.</Text>
+                    ) : (
+                        <FlatList
+                            data={blockedContacts}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderBlockedContact}
+                            contentContainerStyle={styles.list}
+                        />
+                    )}
+                </View>
             </View>
         </SafeAreaView>
     );
