@@ -2,9 +2,8 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator, 
 import { useEffect, useState } from 'react';
 import ChecklistComponent from './ChecklistComponent';
 import { Ionicons } from '@expo/vector-icons';
-
 import { db } from '../../firebaseConfig';
-import { collection, getDocs, query, where, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 
 const HomeScreen = ({ navigation, route }) => {
   const [recommendedContactPhones, setRecommendedContactPhones] = useState([]);
@@ -14,103 +13,105 @@ const HomeScreen = ({ navigation, route }) => {
   const { name, email, recommendNumber } = route.params;
 
   useEffect(() => {
-    async function fetchRecommendedContacts() {
-      setLoading(true);
-      try {
-        const userRef = collection(db, 'users');
-        const userQuery = query(userRef, where('email', '==', email));
-        const userQuerySnapshot = await getDocs(userQuery);
-        const userDoc = userQuerySnapshot.docs[0];
-        const userData = userDoc.data();
-
-        const lastRecommended = userData.lastRecommended.toDate();
-        const now = new Date();
-        const isNewDay = lastRecommended.toDateString() !== now.toDateString();
-
-        const contactsRef = collection(userDoc.ref, 'contacts');
-        const contactsSnapshot = await getDocs(contactsRef);
-
-        let recommendedContacts = [];
-        let allContacts = contactsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ref: doc.ref,
-          ...doc.data(),
-        }));
-
-        if (isNewDay) {
-          for (const contact of allContacts) {
-            await updateDoc(contact.ref, { chosen: false });
-          }
-
-          const newRecommended = [];
-          while (newRecommended.length < recommendNumber && allContacts.length > 0) {
-            const randomIndex = Math.floor(Math.random() * allContacts.length);
-            const [selectedContact] = allContacts.splice(randomIndex, 1);
-
-            newRecommended.push(selectedContact);
-            await updateDoc(selectedContact.ref, { chosen: true });
-          }
-
-          recommendedContacts = newRecommended;
-          await updateDoc(userDoc.ref, { lastRecommended: now });
-        } else {
-          recommendedContacts = allContacts.filter((contact) => contact.chosen);
-        }
-
-        setRecommendedContactNames(recommendedContacts.map((contact) => contact.name));
-        setRecommendedContactPhones(recommendedContacts.map((contact) => contact.phone));
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching recommended contacts:', error);
-        setLoading(false);
-      }
-    }
     fetchRecommendedContacts();
   }, []);
 
-  const handleDelete = async (index, isPermanent) => {
+  async function fetchRecommendedContacts() {
+    setLoading(true);
+    try {
+      const userRef = collection(db, 'users');
+      const userQuery = query(userRef, where('email', '==', email));
+      const userQuerySnapshot = await getDocs(userQuery);
+      const userDoc = userQuerySnapshot.docs[0];
+
+      const contactsRef = collection(userDoc.ref, 'contacts');
+      const contactsSnapshot = await getDocs(contactsRef);
+
+      let allContacts = contactsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ref: doc.ref,
+        ...doc.data(),
+      }));
+
+      let recommendedContacts = allContacts.filter((contact) => contact.chosen);
+
+      if (recommendedContacts.length < recommendNumber) {
+        while (recommendedContacts.length < recommendNumber && allContacts.length > 0) {
+          const randomIndex = Math.floor(Math.random() * allContacts.length);
+          const [selectedContact] = allContacts.splice(randomIndex, 1);
+
+          recommendedContacts.push(selectedContact);
+          await updateDoc(selectedContact.ref, { chosen: true });
+        }
+      }
+
+      setRecommendedContactNames(recommendedContacts.map((contact) => contact.name));
+      setRecommendedContactPhones(recommendedContacts.map((contact) => contact.phone));
+    } catch (error) {
+      console.error('Error fetching recommended contacts:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleDelete = async (index, action) => {
     try {
       const contactPhone = recommendedContactPhones[index];
+      const contactName = recommendedContactNames[index];
 
       const newNames = [...recommendedContactNames];
       const newPhones = [...recommendedContactPhones];
       newNames.splice(index, 1);
       newPhones.splice(index, 1);
 
-      if (!isPermanent) {
-        const userRef = collection(db, 'users');
-        const contactsRef = collection(db, 'users', email, 'contacts');
-        const contactsSnapshot = await getDocs(contactsRef);
+      const contactsRef = collection(db, 'users', email, 'contacts');
+      const contactQuery = query(contactsRef, where('phone', '==', contactPhone));
+      const contactSnapshot = await getDocs(contactQuery);
 
-        const availableContacts = contactsSnapshot.docs.filter(
-          (doc) => !newPhones.includes(doc.data().phone)
-        );
+      if (!contactSnapshot.empty) {
+        const contactDoc = contactSnapshot.docs[0];
 
-        if (availableContacts.length > 0) {
-          const randomContact =
-            availableContacts[Math.floor(Math.random() * availableContacts.length)];
-          newNames.push(randomContact.data().name);
-          newPhones.push(randomContact.data().phone);
-
-          await updateDoc(randomContact.ref, { chosen: true });
+        if (action === "block") {
+          // Move to blockedContacts before deleting
+          const blockedContactsRef = collection(db, 'users', email, 'blockedContacts');
+          await addDoc(blockedContactsRef, contactDoc.data());
         }
-      } else {
-        const contactsRef = collection(db, 'users', email, 'contacts');
-        const contactQuery = query(contactsRef, where('phone', '==', contactPhone));
-        const contactSnapshot = await getDocs(contactQuery);
 
-        if (!contactSnapshot.empty) {
-          const contactDoc = contactSnapshot.docs[0];
-          await deleteDoc(contactDoc.ref);
-        }
+        await deleteDoc(contactDoc.ref); // Remove from contacts
       }
 
       setRecommendedContactNames(newNames);
       setRecommendedContactPhones(newPhones);
+
+      // Fetch a new replacement contact
+      await fetchReplacementContact(newNames, newPhones);
     } catch (error) {
       console.error('Error deleting contact:', error);
     }
   };
+
+  async function fetchReplacementContact(currentNames, currentPhones) {
+    try {
+      const contactsRef = collection(db, 'users', email, 'contacts');
+      const contactsSnapshot = await getDocs(contactsRef);
+
+      const availableContacts = contactsSnapshot.docs
+        .map((doc) => ({ id: doc.id, ref: doc.ref, ...doc.data() }))
+        .filter((contact) => !currentPhones.includes(contact.phone));
+
+      if (availableContacts.length > 0) {
+        const randomContact =
+          availableContacts[Math.floor(Math.random() * availableContacts.length)];
+
+        setRecommendedContactNames([...currentNames, randomContact.name]);
+        setRecommendedContactPhones([...currentPhones, randomContact.phone]);
+
+        await updateDoc(randomContact.ref, { chosen: true });
+      }
+    } catch (error) {
+      console.error('Error fetching replacement contact:', error);
+    }
+  }
 
   const renderChecklistItem = ({ item, index }) => (
     <ChecklistComponent
@@ -128,11 +129,11 @@ const HomeScreen = ({ navigation, route }) => {
       onDelete={() =>
         Alert.alert(
           'Delete Contact',
-          'Do you want to delete this contact permanently or just for today?',
+          'Do you want to delete this contact just for today or send it to the block list?',
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Just for Today', onPress: () => handleDelete(index, false) },
-            { text: 'Permanently', onPress: () => handleDelete(index, true) },
+            { text: 'Just for Today', onPress: () => handleDelete(index, "temporary") },
+            { text: 'Send to Block List', onPress: () => handleDelete(index, "block") },
           ]
         )
       }

@@ -1,14 +1,13 @@
-import { React, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './ContactListScreen.styles';
-import { collection, doc, getDoc, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, deleteDoc, addDoc } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 
 export default function ContactListScreen({ navigation, route }) {
   const { name, email, recommendNumber } = route.params;
-
   const [contactList, setContactList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -38,15 +37,47 @@ export default function ContactListScreen({ navigation, route }) {
     getData();
   }, [userId]);
 
-  // Function to delete a contact
+  // Function to delete a contact or move it to blocked list
   const deleteContact = async (contactId) => {
     try {
       const userRef = doc(db, "users", userId);
       const contactRef = doc(userRef, "contacts", contactId);
+      const contactSnap = await getDoc(contactRef);
 
-      await deleteDoc(contactRef); // Delete from Firestore
-      setContactList(prevContacts => prevContacts.filter(contact => contact[0] !== contactId)); // Update state
-      Alert.alert('Success', 'Contact deleted successfully.');
+      if (!contactSnap.exists()) {
+        Alert.alert("Error", "Contact not found.");
+        return;
+      }
+
+      const contactData = contactSnap.data();
+
+      // Ask user if they want to block the contact instead of deleting
+      Alert.alert(
+        "Permanently Delete?",
+        "Would you like to block this contact or permanetly delete?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Block",
+            onPress: async () => {
+              await addDoc(collection(userRef, "blockedContacts"), contactData);
+              await deleteDoc(contactRef); // Remove from contacts after blocking
+              setContactList(prevContacts => prevContacts.filter(contact => contact[0] !== contactId));
+              Alert.alert('Success', 'Contact moved to blocked list.');
+            },
+            style: "destructive",
+          },
+          {
+            text: "Permenantely Delete",
+            onPress: async () => {
+              await deleteDoc(contactRef); // Only remove contact, don’t block
+              setContactList(prevContacts => prevContacts.filter(contact => contact[0] !== contactId));
+              Alert.alert('Success', 'Contact deleted.');
+            },
+            style: "default",
+          }
+        ]
+      );
     } catch (error) {
       Alert.alert('Error', 'Failed to delete the contact.');
       console.error("Error deleting contact: ", error);
