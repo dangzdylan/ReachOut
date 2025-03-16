@@ -7,6 +7,10 @@ import ImportContactsScreen from '../screens/ImportContacts/ImportContactsScreen
 import ConfigContactsScreen from '../screens/ConfigContactsScreen/ConfigContactsScreen';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import ContactListScreen from '../screens/ContactListScreen/ContactListScreen';
+import SettingsScreen from '../screens/SettingsScreen/SettingsScreen';
+import ChangeContactNumberScreen from '../screens/SettingsScreen/ChangeContactNumberScreen';
+import ChangePasswordScreen from '../screens/SettingsScreen/ChangePasswordScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -47,7 +51,18 @@ const MainStack = () => {
         name="ContactList"
         component={ContactListScreen}
       />
-      
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+      />
+      <Stack.Screen
+        name="ChangeContactNumber"
+        component={ChangeContactNumberScreen}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+      />
   </Stack.Navigator>
   );
 };
