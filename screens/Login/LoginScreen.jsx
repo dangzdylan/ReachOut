@@ -1,15 +1,17 @@
 import React from "react";
-import { useEffect, useState } from "react";
-import { View, Text, SafeAreaView, Alert, Image} from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, SafeAreaView, Alert, Image, Linking, ActivityIndicator} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from "./LoginScreenStyles";
 //import { useAuthRequest, makeRedirectUri } from "expo-auth-session";
 //import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { db } from "../../firebaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 //import { GoogleSignin } from "@react-native-google-signin/google-signin";
 //import auth from "@react-native-firebase/auth";
 import SHA256 from 'crypto-js/sha256';
+//import email from "react-native-email";
+import { saveSession, getSession } from "./AuthService.js";
 /*
 
 
@@ -20,19 +22,36 @@ GoogleSignin.configure({
 
 */
 function LoginScreen({navigation}) {
+  const [loading, setLoading] = useState(true)
   const [emailText, setEmailText] = useState("")
   const [passwordText, setPasswordText] = useState("")
   const [nameText, setNameText] = useState("")
   const [onRegister, setOnRegister] = useState(false)
+  const [forgotPassword, setForgotPassword] = useState(false)
   const [confirmPasswordText, setConfirmPasswordText] = useState("")
   const [alternateText, setAlternateText] = useState("Don't have an account? Create One!")
   const [title, setTitle] = useState("Log in")
 
+  useEffect(() => {
+    const loadSession = async () => {
+      const token = await getSession();
+      if (token) {
+        const docRef = doc(db, "users", token);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setLoading(false)
+          navigation.navigate("HomeScreen", {name: docSnap.data().name, email: token, recommendNumber: docSnap.data().recommendNumber})
+        }
+      }
+      setLoading(false)
+    };
+
+    loadSession();
+  }, []);
 
   const emailHandler = (input) => {
     setEmailText(input)
   }
-
 
   const nameHandler = (input) => {
     setNameText(input)
@@ -51,6 +70,12 @@ function LoginScreen({navigation}) {
 
   const encryptPassword = (password) => {
     return SHA256(password).toString();
+  }
+
+  const doesUserExist = async() => {
+    const docRef = doc(db, "users", emailText);
+    const docSnap = await getDoc(docRef);
+    return [docSnap.exists(), docSnap.data()];
   }
 
 
@@ -77,9 +102,8 @@ function LoginScreen({navigation}) {
       return false;
     }
     //check if email is already in database
-    const docRef = doc(db, "users", emailText);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()){
+    const [exists, data] = await doesUserExist()
+    if (exists) {
       Alert.alert("Error", "Email already exists!");
       return false;
     }
@@ -93,51 +117,104 @@ function LoginScreen({navigation}) {
       return false;
     }
     //VERIFY EMAIL EXISTS IN DATABASE AND VERIFY THAT THE PASSWORD MATCHES THE EMAIL
-    const docRef = doc(db, "users", emailText);
-    const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()){
+    const [exists, data] = await doesUserExist()
+    if (!exists){
       Alert.alert("Error", "Email does not exist!");
       return false;
     }
     const encryptedPassword = encryptPassword(passwordText);
-    if (docSnap.data().password !== encryptedPassword) {
+    if (data.password !== encryptedPassword) {
       setPasswordText("")
       Alert.alert("Error", "Password is incorrect!");
       return false;
     }
-    return [docSnap.data().recommendNumber, docSnap.data().name]
+    return [data.recommendNumber, data.name]
   }
+  /*
+  const getToken = () => {
+    // Generate a random 5-character verification code
+    const generateRandomCode = () => {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < 5; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return result;
+    };
+    
+    // Generate and encrypt the verification code
+    const code = generateRandomCode();
+    const encryptedCode = encryptPassword(code);
+
+    const getRandomSubset = (length, count) => {
+        const indices = new Set();
+        while (indices.size < count) {
+            indices.add(Math.floor(Math.random() * length));
+        }
+        return Array.from(indices).map(index => encryptedCode[index]);
+    };
+
+    const randomSubset = getRandomSubset(encryptedCode.length, 5);
+    return randomSubset.join('');
+  }
+  */
 
 
   const buttonPressHandler = async() => {
-    let verified = false
-    if (onRegister) {
-      verified = await verifyRegistration()
-      if (verified) {
-        const encryptedPassword = encryptPassword(passwordText);
-        const newDocRef = doc(db, "users", emailText)
-        await setDoc(newDocRef, {
-          email: emailText,
-          name: nameText,
-          password: encryptedPassword
-        })
-        navigation.navigate("ImportContacts", {uid: emailText, name: nameText})
+    if (forgotPassword) {
+      if (!emailText) {
+        Alert.alert("Error", "Email is not set!");
+        return;
       }
+      
+      const [exists, data] = await doesUserExist()
+      if (!exists) {
+        Alert.alert("Error", "Email does not exist!");
+        return;
+      }
+      Alert.alert("Next Steps", "Please email reachoutadrv@gmail.com with THIS email address and inform us that you have forgotten your password. We will provide you with next steps.")
+      return;
+
     } else {
-      verified = await verifyLogin()
-      if (verified) {
-        navigation.navigate("HomeScreen", {name: verified[1], email: emailText, recommendNumber: verified[0]}) //const {name, email, recommendNumber} = route.params
+      let verified = false
+      if (onRegister) {
+        verified = await verifyRegistration()
+        if (verified) {
+          const encryptedPassword = encryptPassword(passwordText);
+          const newDocRef = doc(db, "users", emailText)
+          await setDoc(newDocRef, {
+            email: emailText,
+            name: nameText,
+            password: encryptedPassword
+          })
+          navigation.navigate("ImportContacts", {uid: emailText, name: nameText})
+        }
+      } else {
+        verified = await verifyLogin()
+        if (verified) {
+          await saveSession(emailText);
+          setEmailText("");
+          setPasswordText("");
+          setNameText("");
+          setConfirmPasswordText("");
+          navigation.navigate("HomeScreen", {name: verified[1], email: emailText, recommendNumber: verified[0]}) //const {name, email, recommendNumber} = route.params
+        }
       }
     }
   }
 
 
   const changeToRegisterOrLogin = () => {
+    let hadForgottenPassword = false;
+    if (forgotPassword) {
+      hadForgottenPassword = true;
+      setForgotPassword(false);
+    }
     setEmailText("");
     setPasswordText("");
     setNameText("");
     setConfirmPasswordText("");
-    if (!onRegister) {
+    if (!onRegister && !hadForgottenPassword) {
       setOnRegister(true)
       setAlternateText("Already have an account? Log in!")
       setTitle("Register")
@@ -148,39 +225,54 @@ function LoginScreen({navigation}) {
     }
   }
 
+  const forgotPasswordHandler = () => {
+    setForgotPassword(true);
+    setEmailText("");
+    setPasswordText("");
+    setNameText("");
+    setConfirmPasswordText("");
+    setOnRegister(false);
+    setAlternateText("Remembered password? Log in!");
+    setTitle("Forgot Password");
+  }
+
+
 
   return (
-   <SafeAreaView style={styles.container}>
-     <View style={styles.content}>
-        <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
-        <Text style={styles.titleText}>{title}</Text>
-        <TouchableOpacity onPress={() => changeToRegisterOrLogin()} style={styles.createAccount}>
-          <Text style={styles.createAccountText}>{alternateText}</Text>
-        </TouchableOpacity>
-        <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
-        {onRegister && (
-          <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="First Name" placeholderTextColor="gray"/>
-        )}
-        <TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" placeholderTextColor="gray" secureTextEntry={true}/>
-        {onRegister && (
-          <TextInput value={confirmPasswordText} onChangeText={confirmPasswordHandler} style={styles.input} placeholder="Confirm Password" placeholderTextColor="gray" secureTextEntry={true}/>
-        )}
-        {!onRegister && (
-          <TouchableOpacity onPress={() => {}} style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>
-            <Text style={styles.buttonText}>{title}</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
         </View>
-     </View>
-   </SafeAreaView>
+      ) : (
+        <View style={styles.content}>
+          <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
+          <Text style={styles.titleText}>{title}</Text>
+          <TouchableOpacity onPress={() => changeToRegisterOrLogin()} style={styles.createAccount}>
+            <Text style={styles.createAccountText}>{alternateText}</Text>
+          </TouchableOpacity>
+          <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
+          {onRegister && (
+            <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="First Name" placeholderTextColor="gray"/>
+          )}
+          {!forgotPassword && (<TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" placeholderTextColor="gray" secureTextEntry={true}/>)}
+          {onRegister && (
+            <TextInput value={confirmPasswordText} onChangeText={confirmPasswordHandler} style={styles.input} placeholder="Confirm Password" placeholderTextColor="gray" secureTextEntry={true}/>
+          )}
+          {!onRegister && !forgotPassword && (
+            <TouchableOpacity onPress={forgotPasswordHandler} style={styles.forgotPassword}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+          )}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>
+              <Text style={styles.buttonText}>{!forgotPassword ? title : "Reset Password"}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </SafeAreaView>
  );
 }
-
-
-
 
 export default LoginScreen;

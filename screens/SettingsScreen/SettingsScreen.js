@@ -1,11 +1,37 @@
 import React from "react";
-import { View, Text, SafeAreaView } from "react-native";
+import { View, Text, SafeAreaView, Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './SettingsScreen.styles';
 import { Ionicons } from '@expo/vector-icons';
+import { cancelSession } from "../Login/AuthService";
 
 export default function SettingsScreen({navigation, route}) {
     const { name, email, recommendNumber } = route.params;
+
+    const confirmLogout = async () => {
+        const confirm = await new Promise((resolve) => {
+            Alert.alert(
+                "Confirm Logout",
+                "Are you sure you want to logout?",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => resolve(false),
+                        style: "cancel"
+                    },
+                    {
+                        text: "OK",
+                        onPress: () => resolve(true)
+                    }
+                ]
+            );
+        });
+
+        if (confirm) {
+            await cancelSession();
+            navigation.navigate("Login"); // Navigate to the login screen after logout
+        }
+    };
     
     const settingsOptions = [
         {
@@ -25,13 +51,18 @@ export default function SettingsScreen({navigation, route}) {
         },
         {
             title: "Show Blocked Contacts",
-            onPress: () => navigation.navigate("BlockedContactsScreen", { name, email, recommendNumber }),
+            onPress: () => navigation.navigate("BlockedContacts", { name, email, recommendNumber }),
             icon: "ban-outline"
         },
         {
             title: "Import More Contacts",
             onPress: () => navigation.navigate("ImportContactsScreen", { name, email, recommendNumber }),
             icon: "people-outline"
+        },
+        {
+            title: "Logout",
+            onPress: () => confirmLogout(),
+            icon: "log-out-outline"
         }
     ];
 
