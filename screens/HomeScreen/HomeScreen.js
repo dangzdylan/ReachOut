@@ -5,7 +5,8 @@ import { styles } from './HomeScreen.styles';
 import { Ionicons } from '@expo/vector-icons';
 
 import { db } from '../../firebaseConfig';
-import { collection, getDocs, query, where, addDoc, orderBy, updateDoc} from "firebase/firestore";
+import { collection, getDocs, query, where, addDoc, orderBy, updateDoc, doc } from "firebase/firestore";
+import * as Contacts from 'expo-contacts';
 
 const HomeScreen = ({ navigation, route }) => {
 
@@ -16,7 +17,13 @@ const HomeScreen = ({ navigation, route }) => {
 
   const {name, email, recommendNumber} = route.params
 
+  const [importingContacts, setImportingContacts] = useState(false);
+
   useEffect(() => {
+    // First import/update contacts
+    importContacts();
+    
+    // Then proceed with existing fetch operations
     async function fetchRecommendedContacts() {
       setLoading(true)
       try {
@@ -128,6 +135,85 @@ const HomeScreen = ({ navigation, route }) => {
       goToProfile={() => navigateToProfile(index, item)}
     />
   );
+
+  const importContacts = async () => {
+    setImportingContacts(true);
+    try {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status === 'granted') {
+        // Get device contacts
+        const { data } = await Contacts.getContactsAsync({
+          fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers],
+        });
+
+        // Get existing contacts from Firestore
+        const userRef = doc(db, "users", email);
+        const contactsRef = collection(userRef, "contacts");
+        const existingContactsSnap = await getDocs(contactsRef);
+        
+        // Create a map of phone numbers to existing contact data
+        const existingContactsMap = new Map();
+        existingContactsSnap.docs.forEach(doc => {
+          const contactData = doc.data();
+          if (contactData.phone) {
+            // Normalize phone number for comparison
+            const normalizedPhone = contactData.phone.replace(/\D/g, '');
+            existingContactsMap.set(normalizedPhone, {
+              id: doc.id,
+              ...contactData
+            });
+          }
+        });
+
+        // Process device contacts
+        for (const contact of data) {
+          if (!contact.phoneNumbers?.[0]?.number) continue;
+          
+          // Normalize phone number for comparison
+          const phoneNumber = contact.phoneNumbers[0].number;
+          const normalizedPhone = phoneNumber.replace(/\D/g, '');
+          
+          if (existingContactsMap.has(normalizedPhone)) {
+            // Contact exists - update name if changed
+            const existingContact = existingContactsMap.get(normalizedPhone);
+            if (existingContact.name !== contact.name) {
+              const docRef = doc(contactsRef, existingContact.id);
+              await updateDoc(docRef, {
+                name: contact.name,
+                // Preserve all other fields by not updating them
+              });
+            }
+            // Remove from map to track which contacts to delete later
+            existingContactsMap.delete(normalizedPhone);
+          } else {
+            // New contact - add to Firestore
+            await addDoc(contactsRef, {
+              name: contact.name,
+              phone: phoneNumber,
+              chosen: false,
+              checkmarked: false,
+              // Add any other default fields needed
+            });
+          }
+        }
+
+        // Optional: Remove contacts that no longer exist in device
+        // Comment out this section if you want to keep all contacts
+        /*
+        for (const [_, contact] of existingContactsMap) {
+          const docRef = doc(contactsRef, contact.id);
+          await deleteDoc(docRef);
+        }
+        */
+
+        console.log("Contacts updated successfully");
+      }
+    } catch (error) {
+      console.error("Error updating contacts:", error);
+    } finally {
+      setImportingContacts(false);
+    }
+  };
 
   return (
       <View style={styles.container}>
