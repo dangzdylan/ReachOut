@@ -24,7 +24,8 @@ export default function ChangeContactNumberScreen({navigation, route}) {
             const docRef = doc(db, "users", userId);
             await updateDoc(docRef, {
                 recommendNumber: inputNumber,
-            });  
+            });
+            Alert.alert('Note', 'Number of Reach Outs will take into effect the next day.')
             console.log(`Number of contacts ${inputNumber} added successfully`);
         } catch (error) {
             console.error('Error adding field: ', error);
