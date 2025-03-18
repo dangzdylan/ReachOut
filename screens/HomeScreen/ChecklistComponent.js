@@ -90,6 +90,9 @@ const ChecklistComponent = (props) => {
                 <Text style={styles.checkmarkText}>✓</Text>
                 {/* other icon: ✔ */}
             </TouchableOpacity>
+            <TouchableOpacity style={styles.deleteButton} onPress={props.onDelete}>
+              <Ionicons name="trash-outline" size={24} color="#FF0000" />
+            </TouchableOpacity>
         </TouchableOpacity>
     );
 };
@@ -142,6 +145,10 @@ const styles = StyleSheet.create({
     checkmarkText: {
       color: '#000',
       fontSize: 18,
+    },
+    deleteButton: {
+      marginLeft: 15,
+      padding: 8
     }
 });
 
