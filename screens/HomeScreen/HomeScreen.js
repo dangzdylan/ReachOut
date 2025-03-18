@@ -27,147 +27,128 @@ const HomeScreen = ({ navigation, route }) => {
       const contactsRef = collection(userDoc.ref, 'contacts');
       const contactsSnapshot = await getDocs(contactsRef);
 
-      let allContacts = contactsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ref: doc.ref,
-        ...doc.data(),
-      }));
+        let entireContactPhoneList = []
+        let entireContactNameList = []
 
-      let recommendedContacts = allContacts.filter((contact) => contact.chosen);
+        let recommendedContactPhoneList = []
+        let recommendedContactNameList = []
+    
+        // Iterate over each contact
+        let numberOfContacts = 0
+        contactsSnapshot.forEach(async (contactDoc) => {
+          numberOfContacts+=1
+          const contactData = contactDoc.data();
 
-      if (recommendedContacts.length < recommendNumber) {
-        while (recommendedContacts.length < recommendNumber && allContacts.length > 0) {
-          const randomIndex = Math.floor(Math.random() * allContacts.length);
-          const [selectedContact] = allContacts.splice(randomIndex, 1);
+          entireContactPhoneList.push(contactData.phone)
+          entireContactNameList.push(contactData.name)
 
-          recommendedContacts.push(selectedContact);
-          await updateDoc(selectedContact.ref, { chosen: true });
+          if (contactData.chosen) {
+            if (currentTimeStampDay===lastTimeStampDay){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
+              recommendedContactPhoneList.push(contactData.phone)
+              recommendedContactNameList.push(contactData.name)
+            } else {
+              await updateDoc(contactDoc.ref, {
+                chosen: false // Use new Date() if you prefer a Date object
+              });
+            }
+          }
+          
+        });
+
+        //IF IT IS A NEW DAY
+        if (currentTimeStampDay!==lastTimeStampDay){ //replace conditional with currentTimeStampDay!==lastTimestampDay
+          // First, reset all checkmarked fields
+          const allContactsSnapshot = await getDocs(contactsRef);
+          for (const doc of allContactsSnapshot.docs) {
+            const contactData = doc.data();
+            if ('checkmarked' in contactData && contactData.checkmarked) {
+              await updateDoc(doc.ref, {
+                checkmarked: false
+              });
+            }
+          }
+
+          // Then proceed with random selection
+          let randomNumberList = []
+          let i = 0
+          while (i < recommendNumber && i < entireContactPhoneList.length) {
+            // Generate a random number between min and max (inclusive)
+            let randomNumber = Math.floor(Math.random() * numberOfContacts);
+            if (!randomNumberList.includes(randomNumber)) {
+              recommendedContactPhoneList.push(entireContactPhoneList[randomNumber])
+              recommendedContactNameList.push(entireContactNameList[randomNumber])
+              phoneQuery = query(contactsRef, where("phone", "==", entireContactPhoneList[randomNumber]))
+              querySnapshot = await getDocs(phoneQuery)
+              let docWanted = querySnapshot.docs[0]
+              await updateDoc(docWanted.ref, {
+                chosen: true
+              });
+              randomNumberList.push(randomNumber)
+              i+=1
+            }
+          }
+          await updateDoc(userDoc.ref, {lastRecommended: new Date()})
         }
+        setRecommendedContactPhones(recommendedContactPhoneList)
+        setRecommendedContactNames(recommendedContactNameList)
+        setLoading(false)
+      } catch (error) {
+        console.error("Error getting recommended contacts:", error);
+        setLoading(false)
       }
-
-      setRecommendedContactNames(recommendedContacts.map((contact) => contact.name));
-      setRecommendedContactPhones(recommendedContacts.map((contact) => contact.phone));
-    } catch (error) {
-      console.error('Error fetching recommended contacts:', error);
-    } finally {
-      setLoading(false);
     }
-  }
+    fetchRecommendedContacts()
+  }, [])
 
-  const handleDelete = async (index, action) => {
-    try {
-      const contactPhone = recommendedContactPhones[index];
-      const contactName = recommendedContactNames[index];
-
-      const newNames = [...recommendedContactNames];
-      const newPhones = [...recommendedContactPhones];
-      newNames.splice(index, 1);
-      newPhones.splice(index, 1);
-
-      const contactsRef = collection(db, 'users', email, 'contacts');
-      const contactQuery = query(contactsRef, where('phone', '==', contactPhone));
-      const contactSnapshot = await getDocs(contactQuery);
-
-      if (!contactSnapshot.empty) {
-        const contactDoc = contactSnapshot.docs[0];
-
-        if (action === "block") {
-          // Move to blockedContacts before deleting
-          const blockedContactsRef = collection(db, 'users', email, 'blockedContacts');
-          await addDoc(blockedContactsRef, contactDoc.data());
-        }
-
-        await deleteDoc(contactDoc.ref); // Remove from contacts
-      }
-
-      setRecommendedContactNames(newNames);
-      setRecommendedContactPhones(newPhones);
-
-      // Fetch a new replacement contact
-      await fetchReplacementContact(newNames, newPhones);
-    } catch (error) {
-      console.error('Error deleting contact:', error);
-    }
-  };
-
-  async function fetchReplacementContact(currentNames, currentPhones) {
-    try {
-      const contactsRef = collection(db, 'users', email, 'contacts');
-      const contactsSnapshot = await getDocs(contactsRef);
-
-      const availableContacts = contactsSnapshot.docs
-        .map((doc) => ({ id: doc.id, ref: doc.ref, ...doc.data() }))
-        .filter((contact) => !currentPhones.includes(contact.phone));
-
-      if (availableContacts.length > 0) {
-        const randomContact =
-          availableContacts[Math.floor(Math.random() * availableContacts.length)];
-
-        setRecommendedContactNames([...currentNames, randomContact.name]);
-        setRecommendedContactPhones([...currentPhones, randomContact.phone]);
-
-        await updateDoc(randomContact.ref, { chosen: true });
-      }
-    } catch (error) {
-      console.error('Error fetching replacement contact:', error);
-    }
+  const navigateToProfile = (index, item) => {
+    navigation.navigate("Profile", {uid: email, contactPhone: recommendedContactPhones[index], contactName: item, name: name, recommendNumber: recommendNumber, lastScreen: "HomeScreen"})
   }
 
   const renderChecklistItem = ({ item, index }) => (
-    <ChecklistComponent
-      name={item}
-      goToProfile={() =>
-        navigation.navigate('Profile', {
-          uid: email,
-          contactPhone: recommendedContactPhones[index],
-          contactName: item,
-          name,
-          recommendNumber,
-          lastScreen: 'HomeScreen',
-        })
-      }
-      onDelete={() =>
-        Alert.alert(
-          'Delete Contact',
-          'Do you want to delete this contact just for today or send it to the block list?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Just for Today', onPress: () => handleDelete(index, "temporary") },
-            { text: 'Send to Block List', onPress: () => handleDelete(index, "block") },
-          ]
-        )
-      }
+    <ChecklistComponent 
+      name={item} 
+      email={email}
+      goToProfile={() => navigateToProfile(index, item)}
     />
   );
 
   return (
-    <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <>
-          <View style={styles.headerContainer}>
-            <Text style={styles.subtitle}>Hi {name.split(' ')[0]}!</Text>
-            <TouchableOpacity
-              style={styles.contactListButton}
-              onPress={() => navigation.navigate('ContactList', { name, email, recommendNumber })}
-            >
-              <Ionicons name="people-outline" size={30} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Today's Talks</Text>
-          </View>
-          <View style={styles.checklistContainer}>
-            <FlatList
-              data={recommendedContactNames}
-              renderItem={renderChecklistItem}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </View>
-        </>
-      )}
-    </View>
+      <View style={styles.container}>
+          {/* <Image source={require('./assets/ROlogo.png')} /> */}
+          {loading ? <ActivityIndicator size="large" color="#0000ff" /> :
+            <>
+              <View style={styles.headerContainer}>
+                <View style={styles.greetingContainer}>
+                    <Text style={styles.subtitle}>Hi {name.split(" ")[0]}!</Text>
+                </View>
+                <View style={styles.logoContainer}>
+                    <TouchableOpacity onPress={() => {navigation.navigate('ContactList', {name: name, email: email, recommendNumber: recommendNumber})}}>
+                      <Text style={styles.icon}>
+                    <Ionicons name="people-outline" size={30} />
+                  </Text>
+                    </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.titleContainer}>
+                  <Text style={styles.title}>Today's Talks</Text>
+              </View>
+              <View style={styles.checklistContainer}>
+                  <FlatList
+                    data={recommendedContactNames}
+                    renderItem={renderChecklistItem}
+                    keyExtractor={(item, index) => index.toString()} // Use index as key since names could repeat
+                  />
+              </View>
+              <View style={styles.logoContainer}>
+                  <TouchableOpacity onPress={() => {navigation.navigate('Settings', {name: name, email: email, recommendNumber: recommendNumber})}}>
+                    <Text style={styles.icon}>
+                  <Ionicons name="settings-outline" size={30} />
+                </Text>
+                  </TouchableOpacity>
+              </View>
+            </>
+          }
+      </View>
   );
 };
 
