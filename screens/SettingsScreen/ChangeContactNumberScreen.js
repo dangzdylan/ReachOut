@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, SafeAreaView, TextInput, Keyboard } from "react-native";
+import { View, Text, SafeAreaView, TextInput, Keyboard, Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from './SettingsScreen.styles';
 import { doc, updateDoc } from "firebase/firestore";
@@ -39,7 +39,7 @@ export default function ChangeContactNumberScreen({navigation, route}) {
                 <View style={styles.headerContainer}>
                     <TouchableOpacity 
                         style={styles.backButtonSafe}
-                        onPress={() => navigation.goBack()}
+                        onPress={() => navigation.navigate('Settings', {name: name, email: email, recommendNumber: inputNumber})}
                     >
                         <Ionicons name="arrow-back" size={24} color="gray" />
                     </TouchableOpacity>

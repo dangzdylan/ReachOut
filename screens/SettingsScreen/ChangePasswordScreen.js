@@ -28,11 +28,9 @@ export default function ChangePasswordScreen({navigation, route}) {
 
     const buttonPressHandler = async() => {
         verified = await verifyLogin()
-        console.log(verified)
         if (verified) {
             try {
                 const encryptedPassword = encryptPassword(passwordText);
-                console.log('test2')
                 const docRef = doc(db, "users", userId);
                 await updateDoc(docRef, {
                     password: encryptedPassword
