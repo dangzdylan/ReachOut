@@ -38,6 +38,7 @@ export default function ChangePasswordScreen({navigation, route}) {
                     password: encryptedPassword
                 });
                 Alert.alert('Password Saved!')
+                navigation.navigate("HomeScreen", { name: name, email: email, recommendNumber: recommendNumber });
                 console.log('password saved')
             } catch (error) {
                 console.error('Error changing password: ', error);
