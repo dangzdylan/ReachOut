@@ -187,6 +187,10 @@ function LoginScreen({navigation}) {
             name: nameText,
             password: encryptedPassword
           })
+          setEmailText("");
+          setPasswordText("");
+          setNameText("");
+          setConfirmPasswordText("");
           navigation.navigate("ImportContacts", {uid: emailText, name: nameText})
         }
       } else {

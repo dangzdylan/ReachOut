@@ -47,7 +47,7 @@ export default function ConfigContactsScreen({navigation, route}) {
                         value={inputNumber}
                         style={styles.input}
                         onChangeText={handleNumberChange}
-                        placeholder="Enter number"
+                        placeholder="Recommended: 4"
                         placeholderTextColor="#bbb"
                         keyboardType="numeric"
                         maxLength={5} // Limit input length

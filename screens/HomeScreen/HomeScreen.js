@@ -31,6 +31,7 @@ const HomeScreen = ({ navigation, route }) => {
         // Reference to the user's document
         const userRef = collection(db, "users");
         const userQuery = query(userRef, where("email", "==", email));
+
         const userQuerySnapshot = await getDocs(userQuery)
 
         // Get the user document (we assume there is only one user document matching the uid)
@@ -47,9 +48,10 @@ const HomeScreen = ({ navigation, route }) => {
 
         // Reference to the contacts subcollection
         const contactsRef = collection(userDoc.ref, "contacts");
+        const contactsQuery = query(contactsRef, where("recommendedAlready", "==", false))
     
         // Query to get all contacts for that user
-        const contactsSnapshot = await getDocs(contactsRef);
+        const contactsSnapshot = await getDocs(contactsQuery);
 
         let entireContactPhoneList = []
         let entireContactNameList = []
@@ -60,21 +62,26 @@ const HomeScreen = ({ navigation, route }) => {
         // Iterate over each contact
         let numberOfContacts = 0
         contactsSnapshot.forEach(async (contactDoc) => {
-          numberOfContacts+=1
           const contactData = contactDoc.data();
 
-          entireContactPhoneList.push(contactData.phone)
-          entireContactNameList.push(contactData.name)
 
           if (contactData.chosen) {
             if (currentTimeStampDay===lastTimeStampDay){ //replace this with currentTimeStampDay===lastTimeStampDay for 24 hrs
               recommendedContactPhoneList.push(contactData.phone)
               recommendedContactNameList.push(contactData.name)
+              //entireContactPhoneList.push(contactData.phone)
+              //entireContactNameList.push(contactData.name)
+              //numberOfContacts+=1
             } else {
               await updateDoc(contactDoc.ref, {
-                chosen: false // Use new Date() if you prefer a Date object
+                chosen: false, // Use new Date() if you prefer a Date object
+                recommendedAlready: true
               });
             }
+          } else {
+            entireContactPhoneList.push(contactData.phone)
+            entireContactNameList.push(contactData.name)
+            numberOfContacts+=1
           }
           
         });
@@ -82,7 +89,7 @@ const HomeScreen = ({ navigation, route }) => {
         //IF IT IS A NEW DAY
         if (currentTimeStampDay!==lastTimeStampDay){ //replace conditional with currentTimeStampDay!==lastTimestampDay
           // First, reset all checkmarked fields
-          const allContactsSnapshot = await getDocs(contactsRef);
+          const allContactsSnapshot = await getDocs(contactsQuery);
           for (const doc of allContactsSnapshot.docs) {
             const contactData = doc.data();
             if ('checkmarked' in contactData && contactData.checkmarked) {
@@ -96,6 +103,21 @@ const HomeScreen = ({ navigation, route }) => {
           let randomNumberList = []
           let i = 0
           while (i < recommendNumber && i < entireContactPhoneList.length) {
+            // If this is the first iteration and we don't have enough contacts,
+            // reset all contacts' recommendedAlready status to false
+            if (i === 0 && entireContactPhoneList.length < recommendNumber) {
+              console.log("Not enough contacts available, resetting recommendedAlready status");
+              // Get all contacts including those that were previously recommended
+              const allContactsRef = collection(userDoc.ref, "contacts");
+              const allContactsSnapshot = await getDocs(allContactsRef);
+              
+              // Reset recommendedAlready to false for all contacts
+              for (const contactDoc of allContactsSnapshot.docs) {
+                await updateDoc(contactDoc.ref, {
+                  recommendedAlready: false
+                });
+              }
+            }
             // Generate a random number between min and max (inclusive)
             let randomNumber = Math.floor(Math.random() * numberOfContacts);
             if (!randomNumberList.includes(randomNumber)) {
@@ -105,7 +127,7 @@ const HomeScreen = ({ navigation, route }) => {
               querySnapshot = await getDocs(phoneQuery)
               let docWanted = querySnapshot.docs[0]
               await updateDoc(docWanted.ref, {
-                chosen: true
+                chosen: true,
               });
               randomNumberList.push(randomNumber)
               i+=1
