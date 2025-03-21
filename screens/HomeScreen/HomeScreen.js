@@ -105,7 +105,7 @@ const HomeScreen = ({ navigation, route }) => {
           while (i < recommendNumber && i < entireContactPhoneList.length) {
             // If this is the first iteration and we don't have enough contacts,
             // reset all contacts' recommendedAlready status to false
-            if (i === 0 && entireContactPhoneList.length < recommendNumber) {
+            if (i === 0 && entireContactPhoneList.length <= recommendNumber) {
               console.log("Not enough contacts available, resetting recommendedAlready status");
               // Get all contacts including those that were previously recommended
               const allContactsRef = collection(userDoc.ref, "contacts");

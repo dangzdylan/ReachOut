@@ -57,7 +57,7 @@ async function addContactsToFirestore(userId, importedContacts) {
       name: name,     // Name field
       phone: phone,   // Phone field
       chosen: chosen,
-      //recommendedAlready: false
+      recommendedAlready: false
     };
 
     try {
