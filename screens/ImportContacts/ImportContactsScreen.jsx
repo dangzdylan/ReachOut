@@ -23,7 +23,7 @@ export default function ImportContactsScreen({ navigation, route }) {
           name: contact.name,
           phone: contact.phoneNumbers?.[0]?.number || "", // Assume first phone number
           chosen : false,
-          recommendedAlready: false
+          //recommendedAlready: false
         }));
 
         console.log("=====Imported Contacts:", importedContacts[0]);
@@ -57,7 +57,7 @@ async function addContactsToFirestore(userId, importedContacts) {
       name: name,     // Name field
       phone: phone,   // Phone field
       chosen: chosen,
-      recommendedAlready: false
+      //recommendedAlready: false
     };
 
     try {

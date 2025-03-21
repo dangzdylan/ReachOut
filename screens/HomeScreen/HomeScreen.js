@@ -48,7 +48,7 @@ const HomeScreen = ({ navigation, route }) => {
 
         // Reference to the contacts subcollection
         const contactsRef = collection(userDoc.ref, "contacts");
-        const contactsQuery = query(contactsRef, where("recommendedAlready", "==", false))
+        const contactsQuery = query(contactsRef, where("recommendedAlready", "!=", true))
     
         // Query to get all contacts for that user
         const contactsSnapshot = await getDocs(contactsQuery);
