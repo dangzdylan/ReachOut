@@ -5,6 +5,10 @@ import { styles } from './SettingsScreen.styles';
 import { getDocs, collection } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
+import { deleteDoc, doc } from "firebase/firestore";
+import { getDoc, setDoc } from "firebase/firestore";
+
+
 
 export default function BlockedContactsScreen({navigation, route}) {
     const { name, email, recommendNumber } = route.params;
@@ -38,17 +42,44 @@ export default function BlockedContactsScreen({navigation, route}) {
         fetchBlockedContacts();
     }, [userId]);
 
+    const handleUnblockContact = async (contactId) => {
+        try {
+            // Find the contact data before deleting
+            const contactDocRef = doc(db, "users", userId, "blockedContacts", contactId);
+            const contactSnap = await getDoc(contactDocRef);
+            
+            if (contactSnap.exists()) {
+                const contactData = contactSnap.data();
+    
+                // Add back to regular contacts
+                await setDoc(doc(db, "users", userId, "contacts", contactId), contactData);
+    
+                // Remove from blocked contacts
+                await deleteDoc(contactDocRef);
+    
+                // Update state to remove from blocked list
+                setBlockedContacts(prev => prev.filter(contact => contact.id !== contactId));
+    
+                console.log(`Contact ${contactId} unblocked and added back to contacts.`);
+            } else {
+                console.log("Contact not found in blocked list.");
+            }
+        } catch (error) {
+            console.error("Error unblocking contact:", error);
+        }
+    };
+    
+    
+
     // Subcomponent for each blocked contact
     const renderBlockedContact = ({ item }) => (
         <View style={styles.contactItem}>
             <Ionicons name="person-circle-outline" size={30} />
             <Text style={styles.contactName}>{"  " + item.name}</Text>
-            <TouchableOpacity onPress={() => {
-                // Handle unblock or view details
-                // TODO: add functionality to unblock contacts
-            }}>
-                <Ionicons name="remove-circle-outline" size={40} color="red" />
-            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleUnblockContact(item.id)}>
+    <Ionicons name="remove-circle-outline" size={40} color="red" />
+</TouchableOpacity>
+
         </View>
     );
 
