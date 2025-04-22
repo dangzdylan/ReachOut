@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import ChecklistComponent from './ChecklistComponent';
 import { styles } from './HomeScreen.styles';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { db } from '../../firebaseConfig';
 import { collection, getDocs, query, where, addDoc, orderBy, updateDoc, deleteDoc, doc } from "firebase/firestore";
@@ -21,9 +22,6 @@ const HomeScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     // First import/update contacts
-    importContacts();
-    
-    // Then proceed with existing fetch operations
     async function fetchRecommendedContacts() {
       setLoading(true)
       try {
@@ -145,6 +143,12 @@ const HomeScreen = ({ navigation, route }) => {
     }
     fetchRecommendedContacts()
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      importContacts();
+    }, [])
+  );
 
   const handleDelete = async (index, action) => {
     try {
