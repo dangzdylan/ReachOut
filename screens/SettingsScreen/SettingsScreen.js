@@ -55,11 +55,6 @@ export default function SettingsScreen({navigation, route}) {
             icon: "ban-outline"
         },
         {
-            title: "Import More Contacts",
-            onPress: () => navigation.navigate("ImportContactsScreen", { name, email, recommendNumber }),
-            icon: "people-outline"
-        },
-        {
             title: "Logout",
             onPress: () => confirmLogout(),
             icon: "log-out-outline"
