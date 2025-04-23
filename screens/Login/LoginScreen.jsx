@@ -11,7 +11,8 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
-  StatusBar
+  StatusBar,
+  ActivityIndicator
 } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from "./LoginScreenStyles";
