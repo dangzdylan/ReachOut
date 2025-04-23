@@ -44,6 +44,10 @@ function LoginScreen({navigation}) {
   const [confirmPasswordText, setConfirmPasswordText] = useState("")
   const [alternateText, setAlternateText] = useState("Don't have an account? Create One!")
   const [title, setTitle] = useState("Log in")
+  const emailInputRef = React.useRef(null);
+  const nameInputRef = React.useRef(null);
+  const passwordInputRef = React.useRef(null);
+  const confirmPasswordInputRef = React.useRef(null);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -287,6 +291,7 @@ function LoginScreen({navigation}) {
                 <View style={styles.inputsContainer}>
                   <View style={styles.inputWrapper}>
                     <TextInput 
+                      ref={emailInputRef}
                       value={emailText} 
                       onChangeText={emailHandler} 
                       style={styles.input} 
@@ -294,17 +299,32 @@ function LoginScreen({navigation}) {
                       placeholderTextColor="#8D99AE"
                       autoCapitalize="none"
                       keyboardType="email-address"
+                      returnKeyType={onRegister ? "next" : forgotPassword ? "done" : "next"}
+                      onSubmitEditing={() => {
+                        if (onRegister) {
+                          nameInputRef.current?.focus();
+                        } else if (!forgotPassword) {
+                          passwordInputRef.current?.focus();
+                        } else {
+                          Keyboard.dismiss();
+                        }
+                      }}
+                      blurOnSubmit={forgotPassword}
                     />
                   </View>
                   
                   {onRegister && (
                     <View style={styles.inputWrapper}>
                       <TextInput 
+                        ref={nameInputRef}
                         value={nameText} 
                         onChangeText={nameHandler} 
                         style={styles.input} 
                         placeholder="First Name" 
                         placeholderTextColor="#8D99AE"
+                        returnKeyType="next"
+                        onSubmitEditing={() => passwordInputRef.current?.focus()}
+                        blurOnSubmit={false}
                       />
                     </View>
                   )}
@@ -312,12 +332,22 @@ function LoginScreen({navigation}) {
                   {!forgotPassword && (
                     <View style={styles.inputWrapper}>
                       <TextInput 
+                        ref={passwordInputRef}
                         value={passwordText} 
                         onChangeText={passwordHandler} 
                         style={styles.input} 
                         placeholder="Password" 
                         placeholderTextColor="#8D99AE" 
                         secureTextEntry={true}
+                        returnKeyType={onRegister ? "next" : "done"}
+                        onSubmitEditing={() => {
+                          if (onRegister) {
+                            confirmPasswordInputRef.current?.focus();
+                          } else {
+                            Keyboard.dismiss();
+                          }
+                        }}
+                        blurOnSubmit={!onRegister}
                       />
                     </View>
                   )}
@@ -325,12 +355,15 @@ function LoginScreen({navigation}) {
                   {onRegister && (
                     <View style={styles.inputWrapper}>
                       <TextInput 
+                        ref={confirmPasswordInputRef}
                         value={confirmPasswordText} 
                         onChangeText={confirmPasswordHandler} 
                         style={styles.input} 
                         placeholder="Confirm Password" 
                         placeholderTextColor="#8D99AE" 
                         secureTextEntry={true}
+                        returnKeyType="done"
+                        onSubmitEditing={Keyboard.dismiss}
                       />
                     </View>
                   )}
