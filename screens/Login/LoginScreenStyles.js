@@ -1,71 +1,108 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+
+// Define colors for easy access
+const colors = {
+  primary: '#7452a0', // Purple color for buttons
+  textLink: '#6A0DAD', // Purple for links
+  dark: '#2B2D42',
+  light: '#F8F9FA',
+  border: '#E9ECEF',
+  placeholder: '#8D99AE',
+  white: '#FFFFFF',
+  background: '#e8e7ea'
+};
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F3FF', // White background
+    backgroundColor: colors.background,
   },
-  content: {
+  loadingContainer: {
     flex: 1,
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
-    paddingHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingBottom: 10,
+    backgroundColor: colors.background,
+  },
+  image: {
+    width: width * 0.4,
+    height: width * 0.4,
+    resizeMode: 'contain',
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  formContainer: {
+    paddingHorizontal: 30,
+    paddingBottom: 30,
   },
   titleText: {
-    fontSize: 40,
-    marginBottom: 15,
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.dark,
+    marginBottom: 8,
     textAlign: 'center',
   },
-  buttonContainer: {
-    width: '100%',
-    marginTop: 20, // Space between the last input and the button
-  },
-  button: {
-    backgroundColor: 'white',
-    paddingVertical: 12,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#000000',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%', // Full width of the container
-  },
-  buttonText: {
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '400',
-  },
-  input: {
-    width: '100%', // Full width of the container
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9', // Sli
-  },
-  image : {
-    width: '80',
-    height: '80',
-    marginBottom: 20,
-  },
-  forgotPassword: {
-    marginTop: 10, // Add margin if needed
-    alignSelf: 'flex-start', // Aligns the button to the start (left)
-  },
-  forgotPasswordText: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-  },
   createAccount: {
-    marginTop: 10, // Space above the text
-    marginBottom: 20,
-    alignSelf: 'center', // Center the text horizontally
+    marginBottom: 30,
   },
   createAccountText: {
-    color: '#6a5acd', // A darker version of lavender that fits well with the #f9f9f9 background
-    textDecorationLine: 'underline',
-    fontSize: 16, // Adjust font size as needed
+    color: colors.textLink,
+    fontSize: 16,
+    textAlign: 'center',
+    textDecorationLine: 'underline', // Add underline to the text
   },
-})
+  inputsContainer: {
+    marginBottom: 24,
+  },
+  inputWrapper: {
+    marginBottom: 16,
+    borderRadius: 8,
+    backgroundColor: colors.light,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  input: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: colors.dark,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+  },
+  forgotPasswordText: {
+    color: colors.textLink,
+    fontSize: 14,
+    textDecorationLine: 'underline', // Add underline to forgot password text
+  },
+  button: {
+    backgroundColor: colors.primary, // Purple button color
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

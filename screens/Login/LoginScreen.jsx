@@ -1,6 +1,18 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { View, Text, SafeAreaView, Alert, Image, Linking, ActivityIndicator} from "react-native";
+import { 
+  View, 
+  Text, 
+  SafeAreaView, 
+  Alert, 
+  Image, 
+  KeyboardAvoidingView, 
+  Platform, 
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  StatusBar
+} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { styles } from "./LoginScreenStyles";
 //import { useAuthRequest, makeRedirectUri } from "expo-auth-session";
@@ -244,36 +256,103 @@ function LoginScreen({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color="#4361EE" />
         </View>
       ) : (
-        <View style={styles.content}>
-          <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
-          <Text style={styles.titleText}>{title}</Text>
-          <TouchableOpacity onPress={() => changeToRegisterOrLogin()} style={styles.createAccount}>
-            <Text style={styles.createAccountText}>{alternateText}</Text>
-          </TouchableOpacity>
-          <TextInput value={emailText} onChangeText={emailHandler} style={styles.input} placeholder="Email" placeholderTextColor="gray"/>
-          {onRegister && (
-            <TextInput value={nameText} onChangeText={nameHandler} style={styles.input} placeholder="First Name" placeholderTextColor="gray"/>
-          )}
-          {!forgotPassword && (<TextInput value={passwordText} onChangeText={passwordHandler} style={styles.input} placeholder="Password" placeholderTextColor="gray" secureTextEntry={true}/>)}
-          {onRegister && (
-            <TextInput value={confirmPasswordText} onChangeText={confirmPasswordHandler} style={styles.input} placeholder="Confirm Password" placeholderTextColor="gray" secureTextEntry={true}/>
-          )}
-          {!onRegister && !forgotPassword && (
-            <TouchableOpacity onPress={forgotPasswordHandler} style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-          )}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => buttonPressHandler()}>
-              <Text style={styles.buttonText}>{!forgotPassword ? title : "Reset Password"}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardView}
+          >
+            <View style={styles.logoContainer}>
+              <Image source={require('../../assets/ROlogo.png')} style={styles.image} />
+            </View>
+            
+            <ScrollView 
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.formContainer}>
+                <Text style={styles.titleText}>{title}</Text>
+                
+                <TouchableOpacity onPress={() => changeToRegisterOrLogin()} style={styles.createAccount}>
+                  <Text style={styles.createAccountText}>{alternateText}</Text>
+                </TouchableOpacity>
+                
+                <View style={styles.inputsContainer}>
+                  <View style={styles.inputWrapper}>
+                    <TextInput 
+                      value={emailText} 
+                      onChangeText={emailHandler} 
+                      style={styles.input} 
+                      placeholder="Email" 
+                      placeholderTextColor="#8D99AE"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                    />
+                  </View>
+                  
+                  {onRegister && (
+                    <View style={styles.inputWrapper}>
+                      <TextInput 
+                        value={nameText} 
+                        onChangeText={nameHandler} 
+                        style={styles.input} 
+                        placeholder="First Name" 
+                        placeholderTextColor="#8D99AE"
+                      />
+                    </View>
+                  )}
+                  
+                  {!forgotPassword && (
+                    <View style={styles.inputWrapper}>
+                      <TextInput 
+                        value={passwordText} 
+                        onChangeText={passwordHandler} 
+                        style={styles.input} 
+                        placeholder="Password" 
+                        placeholderTextColor="#8D99AE" 
+                        secureTextEntry={true}
+                      />
+                    </View>
+                  )}
+                  
+                  {onRegister && (
+                    <View style={styles.inputWrapper}>
+                      <TextInput 
+                        value={confirmPasswordText} 
+                        onChangeText={confirmPasswordHandler} 
+                        style={styles.input} 
+                        placeholder="Confirm Password" 
+                        placeholderTextColor="#8D99AE" 
+                        secureTextEntry={true}
+                      />
+                    </View>
+                  )}
+                  
+                  {!onRegister && !forgotPassword && (
+                    <TouchableOpacity onPress={forgotPasswordHandler} style={styles.forgotPassword}>
+                      <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                
+                <TouchableOpacity 
+                  style={styles.button} 
+                  onPress={() => buttonPressHandler()}
+                >
+                  <Text style={styles.buttonText}>
+                    {!forgotPassword ? title : "Reset Password"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       )}
     </SafeAreaView>
  );
